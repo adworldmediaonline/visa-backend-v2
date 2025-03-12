@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "app.js",
+  "main": "index.js",
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js"
+    "start": "node index.js",
+    "build": "node index.js",
+    "start-dev": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
