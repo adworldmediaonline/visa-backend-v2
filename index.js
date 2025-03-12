@@ -6,7 +6,7 @@ import bodyParser from 'body-parser';
 import dbConnect from './config/dbConnection.js';
 import visaRouter from './routes/visa.js';
 import temporaryExitRouter from './routes/temporaryExit.js';
-import touristIndividualRouter from '././routes/srilanka/touristIndividual/touristIndividual.js';
+import touristIndividualRouter from './routes/srilanka/touristIndividual/touristIndividual.js';
 import turkeyVisaApplicationRouter from './routes/turkey/turkeyVisaApplicationRoute.js';
 import australiaVisaApplicationRouter from './routes/australia/australiaTourismVisaApplicationRoute.js';
 import { sendMailEveryDayForPendingPayment } from './cron.js';
@@ -135,3 +135,5 @@ app.use('/api/v1/admins', adminsRouter);
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
 });
+
+module.exports = app;
