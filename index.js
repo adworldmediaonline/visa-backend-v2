@@ -36,6 +36,7 @@ import indiaTravelServicesVisaRouter from './routes/indiaTravelServicesVisaRoute
 import blogsRouter from './routes/admin/blogsRoutes.js';
 import categoryRouter from './routes/admin/categoryRoutes.js';
 import adminsRouter from './routes/admin/adminsRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 dotenv.config();
 dbConnect();
@@ -131,6 +132,8 @@ app.use('/api', visaBookingRouter);
 app.use('/api/v1/blogs', blogsRouter);
 app.use('/api/v1/category', categoryRouter);
 app.use('/api/v1/admins', adminsRouter);
+
+app.use('/api/v1/upload', uploadRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
