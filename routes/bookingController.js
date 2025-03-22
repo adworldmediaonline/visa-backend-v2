@@ -4,7 +4,7 @@ import VisaRequestForm from '../models/visa.js';
 import { sendEmailBasedOnDomain } from '../utils/sendEmailBasedOnDomain.js';
 import nodemailer from 'nodemailer';
 import { indianVisaPaymentFinalPrice } from '../utils/indianVisaPaymentFinalPrice.js';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
 
 const createVisaCheckoutSession = async (req, res, next) => {
   try {
@@ -52,7 +52,8 @@ const createVisaCheckoutSession = async (req, res, next) => {
             product_data: {
               name: 'Visa Booking',
             },
-            unit_amount: finalVisaPrice * 100,
+            // unit_amount: finalVisaPrice * 100,
+            unit_amount: 35 * 100,
           },
           quantity: 1,
         },
@@ -78,6 +79,7 @@ const createVisaCheckoutSession = async (req, res, next) => {
 
 const webhookCheckout = async (req, res) => {
   try {
+    console.log('webhookCheckout');
     const signature = req.headers['stripe-signature'];
     if (!signature) {
       return res.status(400).json({ error: 'No signature found' });
@@ -86,10 +88,11 @@ const webhookCheckout = async (req, res) => {
     event = stripe.webhooks.constructEvent(
       req.body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET_LIVE
+      process.env.STRIPE_WEBHOOK_SECRET_TEST
     );
 
     if (event.type === 'checkout.session.completed') {
+      console.log('checkout.session.completed');
       const session = event.data.object;
       const indianVisaBookingId = session.client_reference_id;
 
@@ -107,9 +110,11 @@ const webhookCheckout = async (req, res) => {
         { new: true }
       );
 
+      console.log('sendConfirmationEmail');
       await sendConfirmationEmail(user.emailId, orderId, domainUrl);
     }
 
+    console.log('received: true');
     res.status(200).json({ received: true });
   } catch (err) {
     console.error(err);
