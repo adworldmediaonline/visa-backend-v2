@@ -4,7 +4,7 @@ import VisaRequestForm from '../models/visa.js';
 import { sendEmailBasedOnDomain } from '../utils/sendEmailBasedOnDomain.js';
 import nodemailer from 'nodemailer';
 import { indianVisaPaymentFinalPrice } from '../utils/indianVisaPaymentFinalPrice.js';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE);
 
 const createVisaCheckoutSession = async (req, res, next) => {
   try {
@@ -52,8 +52,8 @@ const createVisaCheckoutSession = async (req, res, next) => {
             product_data: {
               name: 'Visa Booking',
             },
-            // unit_amount: finalVisaPrice * 100,
-            unit_amount: 35 * 100,
+            unit_amount: finalVisaPrice * 100,
+            // unit_amount: 35 * 100,
           },
           quantity: 1,
         },
@@ -88,7 +88,7 @@ const webhookCheckout = async (req, res) => {
     event = stripe.webhooks.constructEvent(
       req.body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET_TEST
+      process.env.STRIPE_WEBHOOK_SECRET_LIVE
     );
 
     if (event.type === 'checkout.session.completed') {
