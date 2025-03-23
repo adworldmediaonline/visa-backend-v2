@@ -188,6 +188,7 @@ const visaRequestFormController = {
   viewAllVisaRequestForm: async (req, res) => {
     try {
       const form = await VisaRequestForm.find()
+        .sort({ createdAt: -1 })
         .populate('step2')
         .populate('step3')
         .populate('step4')
