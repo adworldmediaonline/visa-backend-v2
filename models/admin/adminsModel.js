@@ -9,6 +9,18 @@ const adminSchema = new Schema(
       index: { unique: true },
     },
 
+    name: {
+      type: String,
+      required: [true, 'Name is required'],
+      trim: true,
+    },
+
+    role: {
+      type: String,
+      enum: ['admin', 'superAdmin', 'agent', 'superAgent'],
+      default: 'admin',
+    },
+
     password: {
       type: String,
       trim: true,
