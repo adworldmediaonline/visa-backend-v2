@@ -38,6 +38,7 @@ import categoryRouter from './routes/admin/categoryRoutes.js';
 import adminsRouter from './routes/admin/adminsRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import adminRouter from './routes/adminD/adminRoutes.js';
+import ethiopiaVisaApplicationRouter from './routes/ethiopia/ethiopiaVisaApplicationRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -138,6 +139,9 @@ app.use('/api/v1/upload', uploadRoutes);
 
 // New Admin Routes
 app.use('/api/v1/adminD', adminRouter);
+
+// Ethiopia Visa Routes
+app.use('/api/v1/ethiopia-visa', ethiopiaVisaApplicationRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
