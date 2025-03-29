@@ -14,10 +14,10 @@ const visaTypesAndPrices = JSON.parse(
 const ethiopiaVisaDetailsController = {
     createEthiopiaVisaDetails: async (req, res) => {
         try {
-            const { formId, visaType, visaValidity, companyReferenceNumber, attachments } = req.body;
+            const { emailAddress, visaType, visaValidity, companyReferenceNumber, attachments } = req.body;
 
             // Validate required fields
-            if (!formId || !visaType || !visaValidity) {
+            if (!emailAddress || !visaType || !visaValidity) {
                 return res.status(400).json({
                     error: 'Missing required fields',
                     statusCode: 400
@@ -41,9 +41,17 @@ const ethiopiaVisaDetailsController = {
                 });
             }
 
-            // Create the visa details with the price from the JSON data
+            // First create the visa application
+            const ethiopiaVisaApplication = new EthiopiaVisaApplication({
+                emailAddress,
+                lastExitUrl: "arrival_info",
+            });
+
+            const ethiopiaVisaApplicationResult = await ethiopiaVisaApplication.save();
+
+            // Then create the visa details with the price from the JSON data
             const ethiopiaVisaDetails = new EthiopiaVisaDetails({
-                formId,
+                formId: ethiopiaVisaApplicationResult._id,
                 visaType,
                 visaValidity,
                 companyReferenceNumber,
@@ -55,23 +63,18 @@ const ethiopiaVisaDetailsController = {
 
             // Update the main application to reference these details
             const updatedEthiopiaVisaApplication = await EthiopiaVisaApplication.findOneAndUpdate(
-                { _id: formId },
+                { _id: ethiopiaVisaApplicationResult._id },
                 { visaDetails: ethiopiaVisaDetailsResult._id },
                 { new: true }
             );
 
-            if (!updatedEthiopiaVisaApplication) {
-                // If the application doesn't exist, delete the details we just created
-                await EthiopiaVisaDetails.findByIdAndDelete(ethiopiaVisaDetailsResult._id);
-                return res.status(404).json({
-                    error: 'Ethiopia visa application not found',
-                    statusCode: 404
-                });
-            }
-
-            return res.status(201).json(ethiopiaVisaDetailsResult);
+            // Return both the application and details
+            return res.status(201).json({
+                application: updatedEthiopiaVisaApplication,
+                details: ethiopiaVisaDetailsResult
+            });
         } catch (error) {
-            console.error('Error creating Ethiopia visa details:', error);
+            console.error('Error creating Ethiopia visa application and details:', error);
             return res.status(500).json({ error: error.message });
         }
     },

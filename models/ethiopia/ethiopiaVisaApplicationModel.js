@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { nanoid } from 'nanoid';
-
+import { customAlphabet } from 'nanoid';
+const nanoid = customAlphabet('1234567890', 7);
 const { Schema } = mongoose;
 
 const ethiopiaVisaApplicationSchema = new Schema(
@@ -11,30 +11,45 @@ const ethiopiaVisaApplicationSchema = new Schema(
         return 'ETHevisa' + nanoid();
       },
     },
-    emailAddress: { 
-      type: String, 
+    emailAddress: {
+      type: String,
       required: true,
       trim: true,
-      lowercase: true 
+      lowercase: true
     },
-    visaDetails: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'EthiopiaVisaDetails' 
+    lastExitUrl: {
+      type: String,
+      true: true,
+      lowercase: true
     },
-    arrivalInfo: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'EthiopiaArrivalInfo' 
+    visaDetails: {
+      type: Schema.Types.ObjectId,
+      ref: 'EthiopiaVisaDetails'
     },
-    personalInfo: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'EthiopiaPersonalInfo' 
+    arrivalInfo: {
+      type: Schema.Types.ObjectId,
+      ref: 'EthiopiaArrivalInfo'
     },
-    passportInfo: { 
-      type: Schema.Types.ObjectId, 
-      ref: 'EthiopiaPassportInfo' 
+    personalInfo: {
+      type: Schema.Types.ObjectId,
+      ref: 'EthiopiaPersonalInfo'
     },
-    paymentStatus: { 
-      type: String, 
+    passportInfo: {
+      type: Schema.Types.ObjectId,
+      ref: 'EthiopiaPassportInfo'
+    },
+    additionalApplicants: [{
+      personalInfo: {
+        type: Schema.Types.ObjectId,
+        ref: 'EthiopiaPersonalInfo'
+      },
+      passportInfo: {
+        type: Schema.Types.ObjectId,
+        ref: 'EthiopiaPassportInfo'
+      }
+    }],
+    paymentStatus: {
+      type: String,
       enum: ['pending', 'paid', 'failed'],
       default: 'pending'
     },
@@ -42,9 +57,13 @@ const ethiopiaVisaApplicationSchema = new Schema(
       type: String,
       enum: ['incomplete', 'submitted', 'processing', 'approved', 'rejected'],
       default: 'incomplete'
-    }
+    },
+    noOfVisa: {
+      type: Number,
+      default: 1
+    },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
@@ -52,8 +71,28 @@ const ethiopiaVisaApplicationSchema = new Schema(
 );
 
 // Add virtual property to check if application is complete
-ethiopiaVisaApplicationSchema.virtual('isComplete').get(function() {
+ethiopiaVisaApplicationSchema.virtual('isComplete').get(function () {
   return !!(this.visaDetails && this.arrivalInfo && this.personalInfo && this.passportInfo);
+});
+
+// Pre-save middleware to update noOfVisa based on additionalApplicants
+ethiopiaVisaApplicationSchema.pre('save', function (next) {
+  // Primary applicant counts as 1
+  let totalApplicants = 1;
+
+  // Add the number of additional applicants
+  if (this.additionalApplicants && this.additionalApplicants.length > 0) {
+    // Only count additional applicants that have both personalInfo and passportInfo
+    const validAdditionalApplicants = this.additionalApplicants.filter(
+      applicant => applicant.personalInfo && applicant.passportInfo
+    );
+    totalApplicants += validAdditionalApplicants.length;
+  }
+
+  // Update the noOfVisa field
+  this.noOfVisa = totalApplicants;
+
+  next();
 });
 
 const EthiopiaVisaApplication = mongoose.model('EthiopiaVisaApplication', ethiopiaVisaApplicationSchema);
