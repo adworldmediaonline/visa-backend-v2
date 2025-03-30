@@ -1,26 +1,6 @@
 import EthiopiaVisaApplication from '../../models/ethiopia/ethiopiaVisaApplicationModel.js';
 
 const ethiopiaVisaApplicationController = {
-    createEthiopiaVisaApplication: async (req, res) => {
-        try {
-            const { emailAddress } = req.body;
-
-            if (!emailAddress) {
-                return res.status(400).json({ error: 'Email address is required' });
-            }
-
-            const ethiopiaVisaApplication = new EthiopiaVisaApplication({
-                emailAddress
-            });
-
-            const ethiopiaVisaApplicationResult = await ethiopiaVisaApplication.save();
-
-            return res.status(201).json(ethiopiaVisaApplicationResult);
-        } catch (error) {
-            console.error('Error creating Ethiopia visa application:', error);
-            return res.status(500).json({ error: error.message });
-        }
-    },
 
     getAllEthiopiaVisaApplications: async (req, res) => {
         try {
@@ -28,7 +8,15 @@ const ethiopiaVisaApplicationController = {
                 .populate('visaDetails')
                 .populate('arrivalInfo')
                 .populate('personalInfo')
-                .populate('passportInfo');
+                .populate('passportInfo')
+                .populate({
+                    path: 'additionalApplicants.personalInfo',
+                    model: 'EthiopiaPersonalInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.passportInfo',
+                    model: 'EthiopiaPassportInfo'
+                });
 
             if (!ethiopiaVisaApplications || ethiopiaVisaApplications.length === 0) {
                 return res.status(404).json({
@@ -52,7 +40,15 @@ const ethiopiaVisaApplicationController = {
                 .populate('visaDetails')
                 .populate('arrivalInfo')
                 .populate('personalInfo')
-                .populate('passportInfo');
+                .populate('passportInfo')
+                .populate({
+                    path: 'additionalApplicants.personalInfo',
+                    model: 'EthiopiaPersonalInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.passportInfo',
+                    model: 'EthiopiaPassportInfo'
+                });
 
             if (!ethiopiaVisaApplication) {
                 return res.status(404).json({
@@ -65,6 +61,129 @@ const ethiopiaVisaApplicationController = {
         } catch (error) {
             console.error('Error fetching Ethiopia visa application by ID:', error);
             return res.status(500).json({ error: error.message });
+        }
+    },
+
+    checkApplicationStatus: async (req, res) => {
+        try {
+            const { applicationId, email } = req.body;
+
+            if (!applicationId || !email) {
+                return res.status(400).json({
+                    error: 'Application ID and email are required',
+                    statusCode: 400
+                });
+            }
+
+            // Find the application by ID and email
+            const application = await EthiopiaVisaApplication.findOne({
+                _id: applicationId,
+                emailAddress: email.toLowerCase()
+            })
+                .populate('personalInfo')
+                .populate('visaDetails');
+
+            if (!application) {
+                return res.status(404).json({
+                    error: 'No application found with the provided ID and email',
+                    statusCode: 404
+                });
+            }
+
+            // Map the application status to the frontend expected format
+            let statusFormatted;
+            switch (application.applicationStatus) {
+                case 'approved':
+                    statusFormatted = 'APPROVED';
+                    break;
+                case 'rejected':
+                    statusFormatted = 'REJECTED';
+                    break;
+                case 'processing':
+                    statusFormatted = 'PROCESSING';
+                    break;
+                case 'submitted':
+                    statusFormatted = 'SUBMITTED';
+                    break;
+                default:
+                    statusFormatted = 'INCOMPLETE';
+            }
+
+            // Calculate estimated completion date (example: 5 days from submission)
+            const submissionDate = application.createdAt;
+            const estimatedCompletionDate = new Date(submissionDate);
+            estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + 5);
+
+            // Prepare response data
+            const responseData = {
+                applicationId: application._id,
+                status: statusFormatted,
+                submissionDate: application.createdAt,
+                estimatedCompletionDate: estimatedCompletionDate,
+                applicantName: application.personalInfo ?
+                    `${application.personalInfo.givenName} ${application.personalInfo.surname}` :
+                    'Not provided',
+                paymentStatus: application.paymentStatus,
+                additionalInfo: getAdditionalInfo(application)
+            };
+
+            return res.status(200).json(responseData);
+
+        } catch (error) {
+            console.error('Error checking application status:', error);
+            return res.status(500).json({
+                error: 'Failed to check application status',
+                details: error.message,
+                statusCode: 500
+            });
+        }
+    },
+
+    getAllApplicantsDetails: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            const ethiopiaVisaApplication = await EthiopiaVisaApplication.findById(id)
+                .populate('personalInfo')
+                .populate('passportInfo')
+                .populate({
+                    path: 'additionalApplicants.personalInfo',
+                    model: 'EthiopiaPersonalInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.passportInfo',
+                    model: 'EthiopiaPassportInfo'
+                });
+
+            if (!ethiopiaVisaApplication) {
+                return res.status(404).json({
+                    error: 'Ethiopia visa application not found',
+                    statusCode: 404,
+                });
+            }
+
+            // Prepare the response with primary applicant and additional applicants
+            const applicantsDetails = {
+                primaryApplicant: {
+                    personalInfo: ethiopiaVisaApplication.personalInfo,
+                    passportInfo: ethiopiaVisaApplication.passportInfo
+                },
+                additionalApplicants: ethiopiaVisaApplication.additionalApplicants || [],
+                totalApplicants: 1 + (ethiopiaVisaApplication.additionalApplicants?.length || 0)
+            };
+
+            return res.status(200).json({
+                message: 'All applicants details retrieved successfully',
+                data: applicantsDetails,
+                statusCode: 200
+            });
+        } catch (error) {
+            console.error('Error fetching all applicants details:', error);
+            return res.status(500).json({
+                error: 'Failed to retrieve all applicants details',
+                details: error.message,
+                statusCode: 500
+            });
         }
     },
 
@@ -116,5 +235,29 @@ const ethiopiaVisaApplicationController = {
         }
     }
 };
+
+function getAdditionalInfo(application) {
+    if (application.applicationStatus === 'incomplete') {
+        return 'Your application is incomplete. Please complete all required sections.';
+    }
+
+    if (application.paymentStatus === 'pending') {
+        return 'Your payment is pending. Please complete the payment to process your application.';
+    }
+
+    if (application.applicationStatus === 'processing') {
+        return 'Your application is currently being processed. This typically takes 3-5 business days.';
+    }
+
+    if (application.applicationStatus === 'approved') {
+        return 'Your e-Visa has been approved. Please check your email for the e-Visa document.';
+    }
+
+    if (application.applicationStatus === 'rejected') {
+        return 'Unfortunately, your application has been rejected. Please contact support for more information.';
+    }
+
+    return null;
+}
 
 export default ethiopiaVisaApplicationController;

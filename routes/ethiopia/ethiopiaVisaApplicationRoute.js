@@ -4,14 +4,11 @@ import ethiopiaVisaDetailsController from '../../controllers/ethiopia/ethiopiaVi
 import ethiopiaArrivalInfoController from '../../controllers/ethiopia/ethiopiaArrivalInfoController.js';
 import ethiopiaPersonalInfoController from '../../controllers/ethiopia/ethiopiaPersonalInfoController.js';
 import ethiopiaPassportInfoController from '../../controllers/ethiopia/ethiopiaPassportInfoController.js';
+import ethiopiaAdditionalApplicantsController from '../../controllers/ethiopia/ethiopiaAdditionalApplicantsController.js';
 
 const ethiopiaVisaApplicationRouter = express.Router();
 
 // Main application routes
-ethiopiaVisaApplicationRouter.post(
-    '/create',
-    ethiopiaVisaApplicationController.createEthiopiaVisaApplication
-);
 
 ethiopiaVisaApplicationRouter.get(
     '/all',
@@ -23,6 +20,11 @@ ethiopiaVisaApplicationRouter.get(
     ethiopiaVisaApplicationController.getEthiopiaVisaApplicationById
 );
 
+ethiopiaVisaApplicationRouter.post(
+    '/check-status',
+    ethiopiaVisaApplicationController.checkApplicationStatus
+);
+
 ethiopiaVisaApplicationRouter.put(
     '/:id',
     ethiopiaVisaApplicationController.updateEthiopiaVisaApplication
@@ -32,6 +34,11 @@ ethiopiaVisaApplicationRouter.delete(
     '/:id',
     ethiopiaVisaApplicationController.deleteEthiopiaVisaApplication
 );
+
+ethiopiaVisaApplicationRouter.get(
+    '/:id/applicants',
+    ethiopiaVisaApplicationController.getAllApplicantsDetails
+)
 
 // Visa details routes
 ethiopiaVisaApplicationRouter.post(
@@ -100,6 +107,27 @@ ethiopiaVisaApplicationRouter.get(
 ethiopiaVisaApplicationRouter.put(
     '/passport-info/:formId',
     ethiopiaPassportInfoController.updateEthiopiaPassportInfo
+);
+
+// Additional Applicants
+ethiopiaVisaApplicationRouter.get(
+    '/additional-applicants/:formId',
+    ethiopiaAdditionalApplicantsController.getAdditionalApplicants
+);
+
+ethiopiaVisaApplicationRouter.post(
+    '/additional-applicants/:formId',
+    ethiopiaAdditionalApplicantsController.addAdditionalApplicant
+);
+
+ethiopiaVisaApplicationRouter.put(
+    '/additional-applicants/:formId/:applicantIndex',
+    ethiopiaAdditionalApplicantsController.updateAdditionalApplicant
+);
+
+ethiopiaVisaApplicationRouter.delete(
+    '/additional-applicants/:formId/:applicantIndex',
+    ethiopiaAdditionalApplicantsController.removeAdditionalApplicant
 );
 
 export default ethiopiaVisaApplicationRouter;
