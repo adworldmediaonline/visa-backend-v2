@@ -20,6 +20,11 @@ ethiopiaVisaApplicationRouter.get(
     ethiopiaVisaApplicationController.getEthiopiaVisaApplicationById
 );
 
+ethiopiaVisaApplicationRouter.post(
+    '/check-status',
+    ethiopiaVisaApplicationController.checkApplicationStatus
+);
+
 ethiopiaVisaApplicationRouter.put(
     '/:id',
     ethiopiaVisaApplicationController.updateEthiopiaVisaApplication

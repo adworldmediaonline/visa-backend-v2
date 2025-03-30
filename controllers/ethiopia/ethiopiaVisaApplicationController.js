@@ -64,6 +64,81 @@ const ethiopiaVisaApplicationController = {
         }
     },
 
+    checkApplicationStatus: async (req, res) => {
+        try {
+            const { applicationId, email } = req.body;
+
+            if (!applicationId || !email) {
+                return res.status(400).json({
+                    error: 'Application ID and email are required',
+                    statusCode: 400
+                });
+            }
+
+            // Find the application by ID and email
+            const application = await EthiopiaVisaApplication.findOne({
+                _id: applicationId,
+                emailAddress: email.toLowerCase()
+            })
+                .populate('personalInfo')
+                .populate('visaDetails');
+
+            if (!application) {
+                return res.status(404).json({
+                    error: 'No application found with the provided ID and email',
+                    statusCode: 404
+                });
+            }
+
+            // Map the application status to the frontend expected format
+            let statusFormatted;
+            switch (application.applicationStatus) {
+                case 'approved':
+                    statusFormatted = 'APPROVED';
+                    break;
+                case 'rejected':
+                    statusFormatted = 'REJECTED';
+                    break;
+                case 'processing':
+                    statusFormatted = 'PROCESSING';
+                    break;
+                case 'submitted':
+                    statusFormatted = 'SUBMITTED';
+                    break;
+                default:
+                    statusFormatted = 'INCOMPLETE';
+            }
+
+            // Calculate estimated completion date (example: 5 days from submission)
+            const submissionDate = application.createdAt;
+            const estimatedCompletionDate = new Date(submissionDate);
+            estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + 5);
+
+            // Prepare response data
+            const responseData = {
+                applicationId: application._id,
+                status: statusFormatted,
+                submissionDate: application.createdAt,
+                estimatedCompletionDate: estimatedCompletionDate,
+                applicantName: application.personalInfo ?
+                    `${application.personalInfo.givenName} ${application.personalInfo.surname}` :
+                    'Not provided',
+                paymentStatus: application.paymentStatus,
+                additionalInfo: getAdditionalInfo(application)
+            };
+
+            return res.status(200).json(responseData);
+
+        } catch (error) {
+            console.error('Error checking application status:', error);
+            return res.status(500).json({
+                error: 'Failed to check application status',
+                details: error.message,
+                statusCode: 500
+            });
+        }
+    },
+
     getAllApplicantsDetails: async (req, res) => {
         try {
             const { id } = req.params;
@@ -160,5 +235,29 @@ const ethiopiaVisaApplicationController = {
         }
     }
 };
+
+function getAdditionalInfo(application) {
+    if (application.applicationStatus === 'incomplete') {
+        return 'Your application is incomplete. Please complete all required sections.';
+    }
+
+    if (application.paymentStatus === 'pending') {
+        return 'Your payment is pending. Please complete the payment to process your application.';
+    }
+
+    if (application.applicationStatus === 'processing') {
+        return 'Your application is currently being processed. This typically takes 3-5 business days.';
+    }
+
+    if (application.applicationStatus === 'approved') {
+        return 'Your e-Visa has been approved. Please check your email for the e-Visa document.';
+    }
+
+    if (application.applicationStatus === 'rejected') {
+        return 'Unfortunately, your application has been rejected. Please contact support for more information.';
+    }
+
+    return null;
+}
 
 export default ethiopiaVisaApplicationController;
