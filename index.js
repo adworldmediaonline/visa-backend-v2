@@ -39,6 +39,7 @@ import adminsRouter from './routes/admin/adminsRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import adminRouter from './routes/adminD/adminRoutes.js';
 import ethiopiaVisaApplicationRouter from './routes/ethiopia/ethiopiaVisaApplicationRoute.js';
+import ethiopiaDocumentsRoute from './routes/ethiopia/ethiopiaDocumentsRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -57,6 +58,8 @@ app.post(
 // webhook indian visa payment code end here
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
 
@@ -142,6 +145,7 @@ app.use('/api/v1/adminD', adminRouter);
 
 // Ethiopia Visa Routes
 app.use('/api/v1/ethiopia-visa', ethiopiaVisaApplicationRouter);
+app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
