@@ -18,17 +18,29 @@ const ethiopiaPersonalInfoController = {
         occupation,
         streetAddress,
         addressCity,
-        addressCountry
+        addressCountry,
       } = req.body;
-
+      console.log('formId', formId);
       // Validate required fields
-      if (!formId || !givenName || !surname || !citizenship || !gender ||
-        !countryOfBirth || !dateOfBirth || !placeOfBirth || !email ||
-        !phoneNumber || !occupation || !streetAddress || !addressCity ||
-        !addressCountry) {
+      if (
+        !formId ||
+        !givenName ||
+        !surname ||
+        !citizenship ||
+        !gender ||
+        !countryOfBirth ||
+        !dateOfBirth ||
+        !placeOfBirth ||
+        !email ||
+        !phoneNumber ||
+        !occupation ||
+        !streetAddress ||
+        !addressCity ||
+        !addressCountry
+      ) {
         return res.status(400).json({
           error: 'Missing required fields',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -47,24 +59,30 @@ const ethiopiaPersonalInfoController = {
         occupation,
         streetAddress,
         addressCity,
-        addressCountry
+        addressCountry,
       });
 
       const ethiopiaPersonalInfoResult = await ethiopiaPersonalInfo.save();
 
       // Update the main application to reference this personal info
-      const updatedEthiopiaVisaApplication = await EthiopiaVisaApplication.findOneAndUpdate(
-        { _id: formId },
-        { personalInfo: ethiopiaPersonalInfoResult._id, lastExitUrl: "passport-info" },
-        { new: true }
-      );
+      const updatedEthiopiaVisaApplication =
+        await EthiopiaVisaApplication.findOneAndUpdate(
+          { _id: formId },
+          {
+            personalInfo: ethiopiaPersonalInfoResult._id,
+            lastExitUrl: 'passport-info',
+          },
+          { new: true }
+        );
 
       if (!updatedEthiopiaVisaApplication) {
         // If the application doesn't exist, delete the personal info we just created
-        await EthiopiaPersonalInfo.findByIdAndDelete(ethiopiaPersonalInfoResult._id);
+        await EthiopiaPersonalInfo.findByIdAndDelete(
+          ethiopiaPersonalInfoResult._id
+        );
         return res.status(404).json({
           error: 'Ethiopia visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -79,12 +97,14 @@ const ethiopiaPersonalInfoController = {
     try {
       const { formId } = req.params;
 
-      const ethiopiaPersonalInfo = await EthiopiaPersonalInfo.findOne({ formId });
+      const ethiopiaPersonalInfo = await EthiopiaPersonalInfo.findOne({
+        formId,
+      });
 
       if (!ethiopiaPersonalInfo) {
         return res.status(404).json({
           error: 'Ethiopia personal info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -109,7 +129,7 @@ const ethiopiaPersonalInfoController = {
       if (!ethiopiaPersonalInfo) {
         return res.status(404).json({
           error: 'Ethiopia personal info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -118,7 +138,7 @@ const ethiopiaPersonalInfoController = {
       console.error('Error updating Ethiopia personal info:', error);
       return res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
 
 export default ethiopiaPersonalInfoController;
