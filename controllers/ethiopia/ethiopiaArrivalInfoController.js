@@ -15,16 +15,24 @@ const ethiopiaArrivalInfoController = {
         accommodationName,
         accommodationCity,
         accommodationStreetAddress,
-        accommodationTelephone
+        accommodationTelephone,
       } = req.body;
 
       // Validate required fields
-      if (!formId || !arrivalDate || !departureCountry || !departureCity ||
-        !accommodationType || !accommodationName || !accommodationCity ||
-        !accommodationStreetAddress || !accommodationTelephone) {
+      if (
+        !formId ||
+        !arrivalDate ||
+        !departureCountry ||
+        !departureCity ||
+        !accommodationType ||
+        !accommodationName ||
+        !accommodationCity ||
+        !accommodationStreetAddress ||
+        !accommodationTelephone
+      ) {
         return res.status(400).json({
           error: 'Missing required fields',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -40,24 +48,30 @@ const ethiopiaArrivalInfoController = {
         accommodationName,
         accommodationCity,
         accommodationStreetAddress,
-        accommodationTelephone
+        accommodationTelephone,
       });
 
       const ethiopiaArrivalInfoResult = await ethiopiaArrivalInfo.save();
 
       // Update the main application to reference this arrival info
-      const updatedEthiopiaVisaApplication = await EthiopiaVisaApplication.findOneAndUpdate(
-        { _id: formId },
-        { arrivalInfo: ethiopiaArrivalInfoResult._id, lastExitUrl: "personal-info" },
-        { new: true }
-      );
+      const updatedEthiopiaVisaApplication =
+        await EthiopiaVisaApplication.findOneAndUpdate(
+          { _id: formId },
+          {
+            arrivalInfo: ethiopiaArrivalInfoResult._id,
+            lastExitUrl: 'personal-info',
+          },
+          { new: true }
+        );
 
       if (!updatedEthiopiaVisaApplication) {
         // If the application doesn't exist, delete the arrival info we just created
-        await EthiopiaArrivalInfo.findByIdAndDelete(ethiopiaArrivalInfoResult._id);
+        await EthiopiaArrivalInfo.findByIdAndDelete(
+          ethiopiaArrivalInfoResult._id
+        );
         return res.status(404).json({
           error: 'Ethiopia visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -77,7 +91,7 @@ const ethiopiaArrivalInfoController = {
       if (!ethiopiaArrivalInfo) {
         return res.status(404).json({
           error: 'Ethiopia arrival info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -102,7 +116,7 @@ const ethiopiaArrivalInfoController = {
       if (!ethiopiaArrivalInfo) {
         return res.status(404).json({
           error: 'Ethiopia arrival info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -111,7 +125,7 @@ const ethiopiaArrivalInfoController = {
       console.error('Error updating Ethiopia arrival info:', error);
       return res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
 
 export default ethiopiaArrivalInfoController;

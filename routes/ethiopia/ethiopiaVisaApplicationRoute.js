@@ -11,123 +11,123 @@ const ethiopiaVisaApplicationRouter = express.Router();
 // Main application routes
 
 ethiopiaVisaApplicationRouter.get(
-    '/all',
-    ethiopiaVisaApplicationController.getAllEthiopiaVisaApplications
+  '/all',
+  ethiopiaVisaApplicationController.getAllEthiopiaVisaApplications
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/:id',
-    ethiopiaVisaApplicationController.getEthiopiaVisaApplicationById
+  '/:id',
+  ethiopiaVisaApplicationController.getEthiopiaVisaApplicationById
 );
 
 ethiopiaVisaApplicationRouter.post(
-    '/check-status',
-    ethiopiaVisaApplicationController.checkApplicationStatus
+  '/check-status',
+  ethiopiaVisaApplicationController.checkApplicationStatus
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/:id',
-    ethiopiaVisaApplicationController.updateEthiopiaVisaApplication
+  '/:id',
+  ethiopiaVisaApplicationController.updateEthiopiaVisaApplication
 );
 
 ethiopiaVisaApplicationRouter.delete(
-    '/:id',
-    ethiopiaVisaApplicationController.deleteEthiopiaVisaApplication
+  '/:id',
+  ethiopiaVisaApplicationController.deleteEthiopiaVisaApplication
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/:id/applicants',
-    ethiopiaVisaApplicationController.getAllApplicantsDetails
-)
+  '/:id/applicants',
+  ethiopiaVisaApplicationController.getAllApplicantsDetails
+);
 
 // Visa details routes
 ethiopiaVisaApplicationRouter.post(
-    '/visa-details',
-    ethiopiaVisaDetailsController.createEthiopiaVisaDetails
+  '/visa-details',
+  ethiopiaVisaDetailsController.createEthiopiaVisaDetails
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/visa-details/:formId',
-    ethiopiaVisaDetailsController.getEthiopiaVisaDetailsByFormId
+  '/visa-details/:formId',
+  ethiopiaVisaDetailsController.getEthiopiaVisaDetailsByFormId
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/visa-details/:formId',
-    ethiopiaVisaDetailsController.updateEthiopiaVisaDetails
+  '/visa-details/:formId',
+  ethiopiaVisaDetailsController.updateEthiopiaVisaDetails
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/visa-types/prices',
-    ethiopiaVisaDetailsController.getVisaTypesAndPrices
+  '/visa-types/prices',
+  ethiopiaVisaDetailsController.getVisaTypesAndPrices
 );
 
 // Arrival info routes
 ethiopiaVisaApplicationRouter.post(
-    '/arrival-info',
-    ethiopiaArrivalInfoController.createEthiopiaArrivalInfo
+  '/arrival-info',
+  ethiopiaArrivalInfoController.createEthiopiaArrivalInfo
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/arrival-info/:formId',
-    ethiopiaArrivalInfoController.getEthiopiaArrivalInfoByFormId
+  '/arrival-info/:formId',
+  ethiopiaArrivalInfoController.getEthiopiaArrivalInfoByFormId
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/arrival-info/:formId',
-    ethiopiaArrivalInfoController.updateEthiopiaArrivalInfo
+  '/arrival-info/:formId',
+  ethiopiaArrivalInfoController.updateEthiopiaArrivalInfo
 );
 
 // Personal info routes
 ethiopiaVisaApplicationRouter.post(
-    '/personal-info',
-    ethiopiaPersonalInfoController.createEthiopiaPersonalInfo
+  '/personal-info',
+  ethiopiaPersonalInfoController.createEthiopiaPersonalInfo
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/personal-info/:formId',
-    ethiopiaPersonalInfoController.getEthiopiaPersonalInfoByFormId
+  '/personal-info/:formId',
+  ethiopiaPersonalInfoController.getEthiopiaPersonalInfoByFormId
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/personal-info/:formId',
-    ethiopiaPersonalInfoController.updateEthiopiaPersonalInfo
+  '/personal-info/:formId',
+  ethiopiaPersonalInfoController.updateEthiopiaPersonalInfo
 );
 
 // Passport info routes
 ethiopiaVisaApplicationRouter.post(
-    '/passport-info',
-    ethiopiaPassportInfoController.createEthiopiaPassportInfo
+  '/passport-info',
+  ethiopiaPassportInfoController.createEthiopiaPassportInfo
 );
 
 ethiopiaVisaApplicationRouter.get(
-    '/passport-info/:formId',
-    ethiopiaPassportInfoController.getEthiopiaPassportInfoByFormId
+  '/passport-info/:formId',
+  ethiopiaPassportInfoController.getEthiopiaPassportInfoByFormId
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/passport-info/:formId',
-    ethiopiaPassportInfoController.updateEthiopiaPassportInfo
+  '/passport-info/:formId',
+  ethiopiaPassportInfoController.updateEthiopiaPassportInfo
 );
 
 // Additional Applicants
 ethiopiaVisaApplicationRouter.get(
-    '/additional-applicants/:formId',
-    ethiopiaAdditionalApplicantsController.getAdditionalApplicants
+  '/additional-applicants/:formId',
+  ethiopiaAdditionalApplicantsController.getAdditionalApplicants
 );
 
 ethiopiaVisaApplicationRouter.post(
-    '/additional-applicants/:formId',
-    ethiopiaAdditionalApplicantsController.addAdditionalApplicant
+  '/additional-applicants/:formId',
+  ethiopiaAdditionalApplicantsController.addAdditionalApplicant
 );
 
 ethiopiaVisaApplicationRouter.put(
-    '/additional-applicants/:formId/:applicantIndex',
-    ethiopiaAdditionalApplicantsController.updateAdditionalApplicant
+  '/additional-applicants/:formId/:applicantIndex',
+  ethiopiaAdditionalApplicantsController.updateAdditionalApplicant
 );
 
 ethiopiaVisaApplicationRouter.delete(
-    '/additional-applicants/:formId/:applicantIndex',
-    ethiopiaAdditionalApplicantsController.removeAdditionalApplicant
+  '/additional-applicants/:formId/:applicantIndex',
+  ethiopiaAdditionalApplicantsController.removeAdditionalApplicant
 );
 
 export default ethiopiaVisaApplicationRouter;
