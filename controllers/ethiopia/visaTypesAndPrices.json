@@ -1,260 +1,249 @@
 {
-    "visaTypes": [
+  "visaTypes": [
+    {
+      "name": "Journalist Visa",
+      "validities": [
         {
-            "name": "Journalist Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Application Letter",
-                "Support Letter",
-                "Inviting Company Information"
-            ]
-        },
-        {
-            "name": "Workshop/Conference Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Application Letter",
-                "Invitation Letter"
-            ]
-        },
-        {
-            "name": "Tourist Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo"
-            ]
-        },
-        {
-            "name": "Investment Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                },
-                {
-                    "type": "Multiple Entry 6 Months",
-                    "price": 350
-                },
-                {
-                    "type": "Multiple Entry 1 Year",
-                    "price": 600
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Support Letter"
-            ]
-        },
-        {
-            "name": "Government Work Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                },
-                {
-                    "type": "Multiple Entry 6 Months",
-                    "price": 350
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Application Letter"
-            ]
-        },
-        {
-            "name": "NGO Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Application Letter",
-                "Registration License"
-            ]
-        },
-        {
-            "name": "Private Work Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Business License",
-                "Application Letter",
-                "TIN Certificate"
-            ]
-        },
-        {
-            "name": "Foreign Investor Employee Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Copy of foreign Investor employee Visa"
-            ]
-        },
-        {
-            "name": "Student Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Letter of acceptance from an institution where study will take place"
-            ]
-        },
-        {
-            "name": "Religion Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Support Letter from Religious Institution"
-            ]
-        },
-        {
-            "name": "Residence Visa",
-            "validities": [
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Copy of foreign Investor employee Visa"
-            ]
-        },
-        {
-            "name": "Sports Competition and Training Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Copy of foreign Investor employee Visa"
-            ]
-        },
-        {
-            "name": "Medical Treatment Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                },
-                {
-                    "type": "Multiple Entry 90 Days",
-                    "price": 200
-                },
-                {
-                    "type": "Multiple Entry 6 Months",
-                    "price": 350
-                },
-                {
-                    "type": "Multiple Entry 1 Year",
-                    "price": 600
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Invitation letter from the Health Organization",
-                "Application letter to the health organization"
-            ]
-        },
-        {
-            "name": "Business and Related Studies Visa",
-            "validities": [
-                {
-                    "type": "Single Entry 30 Days",
-                    "price": 100
-                }
-            ],
-            "attachments": [
-                "Passport",
-                "Photo",
-                "Application Letter",
-                "Bank Statement",
-                "Company Profile"
-            ]
+          "type": "Single Entry 30 Days",
+          "price": 100
         }
-    ]
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Application Letter",
+        "Support Letter",
+        "Inviting Company Information"
+      ]
+    },
+    {
+      "name": "Workshop/Conference Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Application Letter",
+        "Invitation Letter"
+      ]
+    },
+    {
+      "name": "Tourist Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        }
+      ],
+      "attachments": ["Passport", "Photo"]
+    },
+    {
+      "name": "Investment Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        },
+        {
+          "type": "Multiple Entry 6 Months",
+          "price": 350
+        },
+        {
+          "type": "Multiple Entry 1 Year",
+          "price": 600
+        }
+      ],
+      "attachments": ["Passport", "Photo", "Support Letter"]
+    },
+    {
+      "name": "Government Work Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        },
+        {
+          "type": "Multiple Entry 6 Months",
+          "price": 350
+        }
+      ],
+      "attachments": ["Passport", "Photo", "Application Letter"]
+    },
+    {
+      "name": "NGO Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Application Letter",
+        "Registration License"
+      ]
+    },
+    {
+      "name": "Private Work Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Business License",
+        "Application Letter",
+        "TIN Certificate"
+      ]
+    },
+    {
+      "name": "Foreign Investor Employee Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Copy of foreign Investor employee Visa"
+      ]
+    },
+    {
+      "name": "Student Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Letter of acceptance from an institution where study will take place"
+      ]
+    },
+    {
+      "name": "Religion Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Support Letter from Religious Institution"
+      ]
+    },
+    {
+      "name": "Residence Visa",
+      "validities": [
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Copy of foreign Investor employee Visa"
+      ]
+    },
+    {
+      "name": "Sports Competition and Training Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Copy of foreign Investor employee Visa"
+      ]
+    },
+    {
+      "name": "Medical Treatment Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        },
+        {
+          "type": "Multiple Entry 90 Days",
+          "price": 200
+        },
+        {
+          "type": "Multiple Entry 6 Months",
+          "price": 350
+        },
+        {
+          "type": "Multiple Entry 1 Year",
+          "price": 600
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Invitation letter from the Health Organization",
+        "Application letter to the health organization"
+      ]
+    },
+    {
+      "name": "Business and Related Studies Visa",
+      "validities": [
+        {
+          "type": "Single Entry 30 Days",
+          "price": 100
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo",
+        "Application Letter",
+        "Bank Statement",
+        "Company Profile"
+      ]
+    }
+  ]
 }
