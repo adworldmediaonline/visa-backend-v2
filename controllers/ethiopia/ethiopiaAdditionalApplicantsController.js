@@ -29,7 +29,7 @@ const ethiopiaAdditionalApplicantsController = {
         passportIssueDate,
         passportExpiryDate,
         passportIssuingCountry,
-        passportIssuingAuthority
+        passportIssuingAuthority,
       } = req.body;
 
       // Find the main application
@@ -37,27 +37,43 @@ const ethiopiaAdditionalApplicantsController = {
       if (!application) {
         return res.status(404).json({
           error: 'Visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
       // Validate required personal info fields
-      if (!givenName || !surname || !citizenship || !gender ||
-        !countryOfBirth || !dateOfBirth || !placeOfBirth || !email ||
-        !phoneNumber || !occupation || !streetAddress || !addressCity ||
-        !addressCountry) {
+      if (
+        !givenName ||
+        !surname ||
+        !citizenship ||
+        !gender ||
+        !countryOfBirth ||
+        !dateOfBirth ||
+        !placeOfBirth ||
+        !email ||
+        !phoneNumber ||
+        !occupation ||
+        !streetAddress ||
+        !addressCity ||
+        !addressCountry
+      ) {
         return res.status(400).json({
           error: 'Missing required personal information fields',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
       // Validate required passport info fields
-      if (!passportNumber || !passportIssueDate || !passportExpiryDate ||
-        !passportIssuingCountry || !passportIssuingAuthority) {
+      if (
+        !passportNumber ||
+        !passportIssueDate ||
+        !passportExpiryDate ||
+        !passportIssuingCountry ||
+        !passportIssuingAuthority
+      ) {
         return res.status(400).json({
           error: 'Missing required passport information fields',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -77,7 +93,7 @@ const ethiopiaAdditionalApplicantsController = {
         streetAddress,
         addressCity,
         addressCountry,
-        isAdditionalApplicant: true
+        isAdditionalApplicant: true,
       });
 
       // Create passport info for additional applicant
@@ -89,7 +105,7 @@ const ethiopiaAdditionalApplicantsController = {
         passportExpiryDate,
         passportIssuingCountry,
         passportIssuingAuthority,
-        isAdditionalApplicant: true
+        isAdditionalApplicant: true,
       });
 
       // Save both documents
@@ -103,7 +119,7 @@ const ethiopiaAdditionalApplicantsController = {
 
       application.additionalApplicants.push({
         personalInfo: savedPersonalInfo._id,
-        passportInfo: savedPassportInfo._id
+        passportInfo: savedPassportInfo._id,
       });
 
       // Save the updated application (the pre-save hook will update noOfVisa)
@@ -117,24 +133,24 @@ const ethiopiaAdditionalApplicantsController = {
         .populate('passportInfo')
         .populate({
           path: 'additionalApplicants.personalInfo',
-          model: 'EthiopiaPersonalInfo'
+          model: 'EthiopiaPersonalInfo',
         })
         .populate({
           path: 'additionalApplicants.passportInfo',
-          model: 'EthiopiaPassportInfo'
+          model: 'EthiopiaPassportInfo',
         });
 
       res.status(201).json({
         message: 'Additional applicant added successfully',
         data: updatedApplication,
-        statusCode: 201
+        statusCode: 201,
       });
     } catch (error) {
       console.error('Error adding additional applicant:', error);
       res.status(500).json({
         error: 'Failed to add additional applicant',
         details: error.message,
-        statusCode: 500
+        statusCode: 500,
       });
     }
   },
@@ -164,7 +180,7 @@ const ethiopiaAdditionalApplicantsController = {
         passportIssueDate,
         passportExpiryDate,
         passportIssuingCountry,
-        passportIssuingAuthority
+        passportIssuingAuthority,
       } = req.body;
 
       // Find the main application
@@ -172,27 +188,43 @@ const ethiopiaAdditionalApplicantsController = {
       if (!application) {
         return res.status(404).json({
           error: 'Visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
       // Check if the applicant index is valid
-      if (!application.additionalApplicants ||
-        !application.additionalApplicants[applicantIndex]) {
+      if (
+        !application.additionalApplicants ||
+        !application.additionalApplicants[applicantIndex]
+      ) {
         return res.status(404).json({
           error: 'Additional applicant not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
       const applicant = application.additionalApplicants[applicantIndex];
 
       // Update personal info if provided
-      if (Object.keys(req.body).some(key =>
-        ['givenName', 'surname', 'citizenship', 'gender', 'countryOfBirth',
-          'dateOfBirth', 'placeOfBirth', 'email', 'phoneNumber', 'occupation',
-          'streetAddress', 'addressCity', 'addressCountry'].includes(key))) {
-
+      if (
+        Object.keys(req.body).some(key =>
+          [
+            'givenName',
+            'surname',
+            'citizenship',
+            'gender',
+            'countryOfBirth',
+            'dateOfBirth',
+            'placeOfBirth',
+            'email',
+            'phoneNumber',
+            'occupation',
+            'streetAddress',
+            'addressCity',
+            'addressCountry',
+          ].includes(key)
+        )
+      ) {
         const personalInfoUpdate = {};
         if (givenName) personalInfoUpdate.givenName = givenName;
         if (surname) personalInfoUpdate.surname = surname;
@@ -216,16 +248,28 @@ const ethiopiaAdditionalApplicantsController = {
       }
 
       // Update passport info if provided
-      if (Object.keys(req.body).some(key =>
-        ['passportNumber', 'passportIssueDate', 'passportExpiryDate',
-          'passportIssuingCountry', 'passportIssuingAuthority'].includes(key))) {
-
+      if (
+        Object.keys(req.body).some(key =>
+          [
+            'passportNumber',
+            'passportIssueDate',
+            'passportExpiryDate',
+            'passportIssuingCountry',
+            'passportIssuingAuthority',
+          ].includes(key)
+        )
+      ) {
         const passportInfoUpdate = {};
         if (passportNumber) passportInfoUpdate.passportNumber = passportNumber;
-        if (passportIssueDate) passportInfoUpdate.passportIssueDate = passportIssueDate;
-        if (passportExpiryDate) passportInfoUpdate.passportExpiryDate = passportExpiryDate;
-        if (passportIssuingCountry) passportInfoUpdate.passportIssuingCountry = passportIssuingCountry;
-        if (passportIssuingAuthority) passportInfoUpdate.passportIssuingAuthority = passportIssuingAuthority;
+        if (passportIssueDate)
+          passportInfoUpdate.passportIssueDate = passportIssueDate;
+        if (passportExpiryDate)
+          passportInfoUpdate.passportExpiryDate = passportExpiryDate;
+        if (passportIssuingCountry)
+          passportInfoUpdate.passportIssuingCountry = passportIssuingCountry;
+        if (passportIssuingAuthority)
+          passportInfoUpdate.passportIssuingAuthority =
+            passportIssuingAuthority;
 
         await EthiopiaPassportInfo.findByIdAndUpdate(
           applicant.passportInfo,
@@ -242,24 +286,24 @@ const ethiopiaAdditionalApplicantsController = {
         .populate('passportInfo')
         .populate({
           path: 'additionalApplicants.personalInfo',
-          model: 'EthiopiaPersonalInfo'
+          model: 'EthiopiaPersonalInfo',
         })
         .populate({
           path: 'additionalApplicants.passportInfo',
-          model: 'EthiopiaPassportInfo'
+          model: 'EthiopiaPassportInfo',
         });
 
       res.status(200).json({
         message: 'Additional applicant updated successfully',
         data: updatedApplication,
-        statusCode: 200
+        statusCode: 200,
       });
     } catch (error) {
       console.error('Error updating additional applicant:', error);
       res.status(500).json({
         error: 'Failed to update additional applicant',
         details: error.message,
-        statusCode: 500
+        statusCode: 500,
       });
     }
   },
@@ -274,16 +318,18 @@ const ethiopiaAdditionalApplicantsController = {
       if (!application) {
         return res.status(404).json({
           error: 'Visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
       // Check if the applicant index is valid
-      if (!application.additionalApplicants ||
-        !application.additionalApplicants[applicantIndex]) {
+      if (
+        !application.additionalApplicants ||
+        !application.additionalApplicants[applicantIndex]
+      ) {
         return res.status(404).json({
           error: 'Additional applicant not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -307,24 +353,24 @@ const ethiopiaAdditionalApplicantsController = {
         .populate('passportInfo')
         .populate({
           path: 'additionalApplicants.personalInfo',
-          model: 'EthiopiaPersonalInfo'
+          model: 'EthiopiaPersonalInfo',
         })
         .populate({
           path: 'additionalApplicants.passportInfo',
-          model: 'EthiopiaPassportInfo'
+          model: 'EthiopiaPassportInfo',
         });
 
       res.status(200).json({
         message: 'Additional applicant removed successfully',
         data: updatedApplication,
-        statusCode: 200
+        statusCode: 200,
       });
     } catch (error) {
       console.error('Error removing additional applicant:', error);
       res.status(500).json({
         error: 'Failed to remove additional applicant',
         details: error.message,
-        statusCode: 500
+        statusCode: 500,
       });
     }
   },
@@ -337,34 +383,34 @@ const ethiopiaAdditionalApplicantsController = {
       const application = await EthiopiaVisaApplication.findById(formId)
         .populate({
           path: 'additionalApplicants.personalInfo',
-          model: 'EthiopiaPersonalInfo'
+          model: 'EthiopiaPersonalInfo',
         })
         .populate({
           path: 'additionalApplicants.passportInfo',
-          model: 'EthiopiaPassportInfo'
+          model: 'EthiopiaPassportInfo',
         });
 
       if (!application) {
         return res.status(404).json({
           error: 'Visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
       res.status(200).json({
         message: 'Additional applicants retrieved successfully',
         data: application.additionalApplicants || [],
-        statusCode: 200
+        statusCode: 200,
       });
     } catch (error) {
       console.error('Error retrieving additional applicants:', error);
       res.status(500).json({
         error: 'Failed to retrieve additional applicants',
         details: error.message,
-        statusCode: 500
+        statusCode: 500,
       });
     }
-  }
+  },
 };
 
 export default ethiopiaAdditionalApplicantsController;

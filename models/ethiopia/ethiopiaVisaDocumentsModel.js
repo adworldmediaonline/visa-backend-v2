@@ -6,16 +6,16 @@ const ethiopiaVisaDocumentsSchema = new Schema(
     visaApplicationId: {
       type: String,
       required: true,
-      ref: 'EthiopiaVisaApplication'
+      ref: 'EthiopiaVisaApplication',
     },
     applicantType: {
       type: String,
       enum: ['primary', 'additional'],
-      default: 'primary'
+      default: 'primary',
     },
     additionalApplicantIndex: {
       type: Number,
-      default: null
+      default: null,
     },
     documents: {
       passport: {
@@ -24,8 +24,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       photo: {
         secure_url: String,
@@ -33,8 +33,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       applicationLetter: {
         secure_url: String,
@@ -42,8 +42,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       supportLetter: {
         secure_url: String,
@@ -51,8 +51,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       invitationLetter: {
         secure_url: String,
@@ -60,8 +60,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       invitingCompanyInfo: {
         secure_url: String,
@@ -69,8 +69,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       registrationLicense: {
         secure_url: String,
@@ -78,8 +78,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       businessLicense: {
         secure_url: String,
@@ -87,8 +87,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       tinCertificate: {
         secure_url: String,
@@ -96,8 +96,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       foreignInvestorEmployeeVisa: {
         secure_url: String,
@@ -105,8 +105,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       acceptanceLetter: {
         secure_url: String,
@@ -114,8 +114,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       bankStatement: {
         secure_url: String,
@@ -123,8 +123,8 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
+          default: Date.now,
+        },
       },
       companyProfile: {
         secure_url: String,
@@ -132,19 +132,22 @@ const ethiopiaVisaDocumentsSchema = new Schema(
         fileName: String,
         uploadedAt: {
           type: Date,
-          default: Date.now
-        }
-      }
+          default: Date.now,
+        },
+      },
     },
     isComplete: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-const EthiopiaVisaDocuments = mongoose.model('EthiopiaVisaDocuments', ethiopiaVisaDocumentsSchema);
+const EthiopiaVisaDocuments = mongoose.model(
+  'EthiopiaVisaDocuments',
+  ethiopiaVisaDocumentsSchema
+);
 export default EthiopiaVisaDocuments;

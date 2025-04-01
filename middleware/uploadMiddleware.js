@@ -10,17 +10,46 @@ const storage = multer.diskStorage({
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  // Allowed file types
-  const filetypes = /jpeg|jpg|png|pdf/;
-  // Check extension
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check mime type
-  const mimetype = filetypes.test(file.mimetype);
+  try {
+    // Allowed file types - expanded to include more formats
+    const filetypes = /jpeg|jpg|png|pdf|webp|gif|tiff|bmp/i;
 
-  if (extname && mimetype) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only images and PDFs are allowed!'), false);
+    // Get file extension and convert to lowercase
+    const extension = path.extname(file.originalname).toLowerCase();
+
+    // Check extension
+    const extname = filetypes.test(extension);
+
+    // Check mime type
+    const mimetype = filetypes.test(file.mimetype);
+
+    // Accept common image/pdf mime types even if extension doesn't match
+    const validMimeTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/gif',
+      'image/tiff',
+      'image/bmp',
+      'application/pdf',
+    ];
+
+    if (extname && mimetype) {
+      cb(null, true);
+    } else if (validMimeTypes.includes(file.mimetype)) {
+      // If mimetype is valid but extension is not, still accept the file
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          'Only images (JPEG, JPG, PNG, WebP, GIF, TIFF, BMP) and PDFs are allowed!'
+        ),
+        false
+      );
+    }
+  } catch (error) {
+    cb(new Error(`File validation error: ${error.message}`), false);
   }
 };
 
@@ -29,7 +58,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max file size
+    fileSize: 10 * 1024 * 1024, // 10MB max file size
   },
 });
 
