@@ -157,7 +157,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       data: {
         documentId: documentRecord._id,
         normalizedDocumentTypeCamelCase,
-        fileInfo: documentRecord.documents[normalizedDocumentTypeCamelCase],
+        fileInfo: documentRecord.documents[documentType],
         isComplete: documentRecord.isComplete,
       },
     });
@@ -230,8 +230,12 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
     }
 
     const documentRecord = await EthiopiaVisaDocuments.findOne(query);
+    const normalizedDocumentTypeCamelCase = camelCase(documentType);
 
-    if (!documentRecord || !documentRecord.documents[documentType]) {
+    if (
+      !documentRecord ||
+      !documentRecord.documents[normalizedDocumentTypeCamelCase]
+    ) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
         message: 'Document not found',
@@ -239,19 +243,22 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
     }
 
     // Delete from cloudinary
-    const publicId = documentRecord.documents[documentType].public_id;
+    const publicId =
+      documentRecord.documents[normalizedDocumentTypeCamelCase].public_id;
+    console.log(publicId);
     await cloudinary.uploader.destroy(publicId);
 
     // Remove document from record
-    documentRecord.documents[documentType] = undefined;
+    documentRecord.documents[normalizedDocumentTypeCamelCase] = undefined;
 
     // Update isComplete status
     const visaType = documentRecord.visaType;
     const requiredDocs = getRequiredDocuments(visaType);
     const isComplete = requiredDocs.every(docType => {
       // Find a matching document in the current document record
+      console.log(documentRecord.documents);
       const docKey = Object.keys(documentRecord.documents).find(
-        key => key.toLowerCase().replace(/\s+/g, '') === docType
+        key => camelCase(key) === docType
       );
       return (
         docKey &&
