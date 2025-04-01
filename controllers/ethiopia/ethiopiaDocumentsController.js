@@ -4,6 +4,7 @@ import cloudinary from '../../config/cloudinary.js';
 import EthiopiaVisaApplication from '../../models/ethiopia/ethiopiaVisaApplicationModel.js';
 import EthiopiaVisaDocuments from '../../models/ethiopia/ethiopiaVisaDocumentsModel.js';
 import visaTypesAndPrices from './visaTypesAndPrices.json' assert { type: 'json' };
+import camelCase from 'lodash.camelcase';
 
 // Get required documents from visaTypesAndPrices.json
 const getRequiredDocuments = visaType => {
@@ -32,7 +33,6 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       additionalApplicantIndex = null,
     } = req.body;
 
-    console.log(req.body);
     if (!applicationId || !documentType || !visaType) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -44,6 +44,8 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     // Check if the document type is valid for the visa type
     const requiredDocuments = getRequiredDocuments(visaType);
     const normalizedDocType = documentType.toLowerCase().replace(/\s+/g, '');
+
+    // const normalizedDocType = camelcase(documentType);
 
     if (!requiredDocuments.includes(normalizedDocType)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
@@ -104,7 +106,9 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     }
 
     // Update the document field
-    documentRecord.documents[documentType] = {
+    const normalizedDocumentTypeCamelCase = camelCase(documentType);
+
+    documentRecord.documents[normalizedDocumentTypeCamelCase] = {
       secure_url: result.secure_url,
       public_id: result.public_id,
       fileName: req.file.originalname,
@@ -152,8 +156,8 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       message: `${documentType} uploaded successfully`,
       data: {
         documentId: documentRecord._id,
-        documentType,
-        fileInfo: documentRecord.documents[documentType],
+        normalizedDocumentTypeCamelCase,
+        fileInfo: documentRecord.documents[normalizedDocumentTypeCamelCase],
         isComplete: documentRecord.isComplete,
       },
     });
