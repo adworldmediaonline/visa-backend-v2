@@ -15,72 +15,79 @@ const ethiopiaVisaApplicationSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true
+      lowercase: true,
     },
     lastExitUrl: {
       type: String,
       true: true,
-      lowercase: true
+      lowercase: true,
     },
     visaDetails: {
       type: Schema.Types.ObjectId,
-      ref: 'EthiopiaVisaDetails'
+      ref: 'EthiopiaVisaDetails',
     },
     arrivalInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'EthiopiaArrivalInfo'
+      ref: 'EthiopiaArrivalInfo',
     },
     personalInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'EthiopiaPersonalInfo'
+      ref: 'EthiopiaPersonalInfo',
     },
     passportInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'EthiopiaPassportInfo'
+      ref: 'EthiopiaPassportInfo',
     },
     documents: {
       type: Schema.Types.ObjectId,
-      ref: 'EthiopiaVisaDocuments'
+      ref: 'EthiopiaVisaDocuments',
     },
-    additionalApplicants: [{
-      personalInfo: {
-        type: Schema.Types.ObjectId,
-        ref: 'EthiopiaPersonalInfo'
+    additionalApplicants: [
+      {
+        personalInfo: {
+          type: Schema.Types.ObjectId,
+          ref: 'EthiopiaPersonalInfo',
+        },
+        passportInfo: {
+          type: Schema.Types.ObjectId,
+          ref: 'EthiopiaPassportInfo',
+        },
+        documents: {
+          type: Schema.Types.ObjectId,
+          ref: 'EthiopiaVisaDocuments',
+        },
       },
-      passportInfo: {
-        type: Schema.Types.ObjectId,
-        ref: 'EthiopiaPassportInfo'
-      },
-      documents: {
-        type: Schema.Types.ObjectId,
-        ref: 'EthiopiaVisaDocuments'
-      }
-    }],
+    ],
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed'],
-      default: 'pending'
+      default: 'pending',
     },
     applicationStatus: {
       type: String,
       enum: ['incomplete', 'submitted', 'processing', 'approved', 'rejected'],
-      default: 'incomplete'
+      default: 'incomplete',
     },
     noOfVisa: {
       type: Number,
-      default: 1
+      default: 1,
     },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    toObject: { virtuals: true },
   }
 );
 
 // Add virtual property to check if application is complete
 ethiopiaVisaApplicationSchema.virtual('isComplete').get(function () {
-  return !!(this.visaDetails && this.arrivalInfo && this.personalInfo && this.passportInfo);
+  return !!(
+    this.visaDetails &&
+    this.arrivalInfo &&
+    this.personalInfo &&
+    this.passportInfo
+  );
 });
 
 // Pre-save middleware to update noOfVisa based on additionalApplicants
@@ -103,5 +110,8 @@ ethiopiaVisaApplicationSchema.pre('save', function (next) {
   next();
 });
 
-const EthiopiaVisaApplication = mongoose.model('EthiopiaVisaApplication', ethiopiaVisaApplicationSchema);
+const EthiopiaVisaApplication = mongoose.model(
+  'EthiopiaVisaApplication',
+  ethiopiaVisaApplicationSchema
+);
 export default EthiopiaVisaApplication;
