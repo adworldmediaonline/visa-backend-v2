@@ -3,6 +3,7 @@ import EthiopiaVisaApplication from '../../models/ethiopia/ethiopiaVisaApplicati
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { sendEthiopiaApplicationConfirmation } from '../../utils/mailConfigs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -79,6 +80,14 @@ const ethiopiaVisaDetailsController = {
           { visaDetails: ethiopiaVisaDetailsResult._id },
           { new: true }
         );
+
+      try {
+        await sendEthiopiaApplicationConfirmation(ethiopiaVisaApplicationResult._id);
+        console.log('Application confirmation email sent successfully');
+      } catch (emailError) {
+        console.error('Error sending application confirmation email:', emailError);
+        // Continue with the response even if email fails
+      }
 
       // Return both the application and details
       return res.status(201).json({
