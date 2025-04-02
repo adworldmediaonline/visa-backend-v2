@@ -142,7 +142,7 @@ app.use('/api/v1/upload', uploadRoutes);
 
 // New Admin Routes
 app.use('/api/v1/adminD', adminRouter);
-
+//
 // Ethiopia Visa Routes
 app.use('/api/v1/ethiopia-visa', ethiopiaVisaApplicationRouter);
 app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);

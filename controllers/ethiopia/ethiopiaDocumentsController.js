@@ -3,8 +3,25 @@ import { StatusCodes } from 'http-status-codes';
 import cloudinary from '../../config/cloudinary.js';
 import EthiopiaVisaApplication from '../../models/ethiopia/ethiopiaVisaApplicationModel.js';
 import EthiopiaVisaDocuments from '../../models/ethiopia/ethiopiaVisaDocumentsModel.js';
-import visaTypesAndPrices from './visaTypesAndPrices.json' assert { type: 'json' };
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { readFile } from 'fs/promises';
 import camelCase from 'lodash.camelcase';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+let visaTypesAndPrices;
+try {
+  const jsonContent = await readFile(
+    join(__dirname, 'visaTypesAndPrices.json'),
+    'utf8'
+  );
+  visaTypesAndPrices = JSON.parse(jsonContent);
+} catch (error) {
+  console.error('Error loading visa types and prices:', error);
+  visaTypesAndPrices = { visaTypes: [] };
+}
 
 // Get required documents from visaTypesAndPrices.json
 const getRequiredDocuments = visaType => {
