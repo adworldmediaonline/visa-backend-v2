@@ -41,6 +41,7 @@ import adminRouter from './routes/adminD/adminRoutes.js';
 import ethiopiaVisaApplicationRouter from './routes/ethiopia/ethiopiaVisaApplicationRoute.js';
 import ethiopiaDocumentsRoute from './routes/ethiopia/ethiopiaDocumentsRoute.js';
 import mailRouter from './routes/ethiopia/ethiopiaEmailRoutes.js';
+import ethiopiaPaymentRouter from './routes/ethiopia/ethiopiaPaymentRoutes.js';
 
 dotenv.config();
 dbConnect();
@@ -130,7 +131,7 @@ app.use(
 );
 app.use('/evisapayment', paymentVisaApplicationRouter);
 
-// sendMailEveryDayForPendingPayment();
+sendMailEveryDayForPendingPayment();
 
 app.use('/api', visaBookingRouter);
 
@@ -148,6 +149,7 @@ app.use('/api/v1/adminD', adminRouter);
 app.use('/api/v1/ethiopia-visa', ethiopiaVisaApplicationRouter);
 app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);
 app.use('/api/v1/mail', mailRouter);
+app.use('/api/v1/ethiopia-visa/payments', ethiopiaPaymentRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
