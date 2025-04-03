@@ -42,6 +42,7 @@ import ethiopiaVisaApplicationRouter from './routes/ethiopia/ethiopiaVisaApplica
 import ethiopiaDocumentsRoute from './routes/ethiopia/ethiopiaDocumentsRoute.js';
 import mailRouter from './routes/ethiopia/ethiopiaEmailRoutes.js';
 import ethiopiaPaymentRouter from './routes/ethiopia/ethiopiaPaymentRoutes.js';
+import ethiopiaGovRefDetailsRouter from './routes/ethiopia/ethiopiaGovRefDetailsRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -150,6 +151,7 @@ app.use('/api/v1/ethiopia-visa', ethiopiaVisaApplicationRouter);
 app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);
 app.use('/api/v1/mail', mailRouter);
 app.use('/api/v1/ethiopia-visa/payments', ethiopiaPaymentRouter);
+app.use('/api/v1/ethiopia-visa/gov-ref', ethiopiaGovRefDetailsRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);

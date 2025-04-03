@@ -9,6 +9,8 @@ const ethiopiaVisaApplicationController = {
                 .populate('arrivalInfo')
                 .populate('personalInfo')
                 .populate('passportInfo')
+                .populate('documents')
+                .populate('govRefDetails')
                 .populate({
                     path: 'additionalApplicants.personalInfo',
                     model: 'EthiopiaPersonalInfo'
@@ -16,6 +18,14 @@ const ethiopiaVisaApplicationController = {
                 .populate({
                     path: 'additionalApplicants.passportInfo',
                     model: 'EthiopiaPassportInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.documents',
+                    model: 'EthiopiaVisaDocuments'
+                })
+                .populate({
+                    path: 'additionalApplicants.govRefDetails',
+                    model: 'EthiopiaGovRefDetails'
                 });
 
             if (!ethiopiaVisaApplications || ethiopiaVisaApplications.length === 0) {
@@ -41,6 +51,8 @@ const ethiopiaVisaApplicationController = {
                 .populate('arrivalInfo')
                 .populate('personalInfo')
                 .populate('passportInfo')
+                .populate('documents')
+                .populate('govRefDetails')
                 .populate({
                     path: 'additionalApplicants.personalInfo',
                     model: 'EthiopiaPersonalInfo'
@@ -48,6 +60,14 @@ const ethiopiaVisaApplicationController = {
                 .populate({
                     path: 'additionalApplicants.passportInfo',
                     model: 'EthiopiaPassportInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.documents',
+                    model: 'EthiopiaVisaDocuments'
+                })
+                .populate({
+                    path: 'additionalApplicants.govRefDetails',
+                    model: 'EthiopiaGovRefDetails'
                 });
 
             if (!ethiopiaVisaApplication) {
@@ -146,6 +166,8 @@ const ethiopiaVisaApplicationController = {
             const ethiopiaVisaApplication = await EthiopiaVisaApplication.findById(id)
                 .populate('personalInfo')
                 .populate('passportInfo')
+                .populate('documents')
+                .populate('govRefDetails')
                 .populate({
                     path: 'additionalApplicants.personalInfo',
                     model: 'EthiopiaPersonalInfo'
@@ -153,6 +175,14 @@ const ethiopiaVisaApplicationController = {
                 .populate({
                     path: 'additionalApplicants.passportInfo',
                     model: 'EthiopiaPassportInfo'
+                })
+                .populate({
+                    path: 'additionalApplicants.documents',
+                    model: 'EthiopiaVisaDocuments'
+                })
+                .populate({
+                    path: 'additionalApplicants.govRefDetails',
+                    model: 'EthiopiaGovRefDetails'
                 });
 
             if (!ethiopiaVisaApplication) {

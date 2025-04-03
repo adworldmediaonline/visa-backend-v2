@@ -42,6 +42,10 @@ const ethiopiaVisaApplicationSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'EthiopiaVisaDocuments',
     },
+    govRefDetails: {
+      type: Schema.Types.ObjectId,
+      ref: 'EthiopiaGovRefDetails',
+    },
     additionalApplicants: [
       {
         personalInfo: {
@@ -55,6 +59,10 @@ const ethiopiaVisaApplicationSchema = new Schema(
         documents: {
           type: Schema.Types.ObjectId,
           ref: 'EthiopiaVisaDocuments',
+        },
+        govRefDetails: {
+          type: Schema.Types.ObjectId,
+          ref: 'EthiopiaGovRefDetails',
         },
       },
     ],
