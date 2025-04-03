@@ -11,15 +11,22 @@ const ethiopiaPassportInfoController = {
         passportIssueDate,
         passportExpiryDate,
         passportIssuingCountry,
-        passportIssuingAuthority
+        passportIssuingAuthority,
       } = req.body;
 
       // Validate required fields
-      if (!formId || !passportType || !passportNumber || !passportIssueDate ||
-        !passportExpiryDate || !passportIssuingCountry || !passportIssuingAuthority) {
+      if (
+        !formId ||
+        !passportType ||
+        !passportNumber ||
+        !passportIssueDate ||
+        !passportExpiryDate ||
+        !passportIssuingCountry ||
+        !passportIssuingAuthority
+      ) {
         return res.status(400).json({
           error: 'Missing required fields',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -30,7 +37,7 @@ const ethiopiaPassportInfoController = {
       if (expiryDate < currentDate) {
         return res.status(400).json({
           error: 'Passport is expired',
-          statusCode: 400
+          statusCode: 400,
         });
       }
 
@@ -42,24 +49,30 @@ const ethiopiaPassportInfoController = {
         passportIssueDate,
         passportExpiryDate,
         passportIssuingCountry,
-        passportIssuingAuthority
+        passportIssuingAuthority,
       });
 
       const ethiopiaPassportInfoResult = await ethiopiaPassportInfo.save();
 
       // Update the main application to reference this passport info
-      const updatedEthiopiaVisaApplication = await EthiopiaVisaApplication.findOneAndUpdate(
-        { _id: formId },
-        { passportInfo: ethiopiaPassportInfoResult._id, lastExitUrl: "payment-page" },
-        { new: true }
-      );
+      const updatedEthiopiaVisaApplication =
+        await EthiopiaVisaApplication.findOneAndUpdate(
+          { _id: formId },
+          {
+            passportInfo: ethiopiaPassportInfoResult._id,
+            lastExitUrl: 'additional-applicants',
+          },
+          { new: true }
+        );
 
       if (!updatedEthiopiaVisaApplication) {
         // If the application doesn't exist, delete the passport info we just created
-        await EthiopiaPassportInfo.findByIdAndDelete(ethiopiaPassportInfoResult._id);
+        await EthiopiaPassportInfo.findByIdAndDelete(
+          ethiopiaPassportInfoResult._id
+        );
         return res.status(404).json({
           error: 'Ethiopia visa application not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -89,12 +102,14 @@ const ethiopiaPassportInfoController = {
     try {
       const { formId } = req.params;
 
-      const ethiopiaPassportInfo = await EthiopiaPassportInfo.findOne({ formId });
+      const ethiopiaPassportInfo = await EthiopiaPassportInfo.findOne({
+        formId,
+      });
 
       if (!ethiopiaPassportInfo) {
         return res.status(404).json({
           error: 'Ethiopia passport info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -118,7 +133,7 @@ const ethiopiaPassportInfoController = {
         if (expiryDate < currentDate) {
           return res.status(400).json({
             error: 'Passport is expired',
-            statusCode: 400
+            statusCode: 400,
           });
         }
       }
@@ -132,7 +147,7 @@ const ethiopiaPassportInfoController = {
       if (!ethiopiaPassportInfo) {
         return res.status(404).json({
           error: 'Ethiopia passport info not found',
-          statusCode: 404
+          statusCode: 404,
         });
       }
 
@@ -141,7 +156,7 @@ const ethiopiaPassportInfoController = {
       console.error('Error updating Ethiopia passport info:', error);
       return res.status(500).json({ error: error.message });
     }
-  }
+  },
 };
 
 export default ethiopiaPassportInfoController;
