@@ -55,7 +55,7 @@ const ethiopiaVisaDetailsController = {
       // First create the visa application
       const ethiopiaVisaApplication = new EthiopiaVisaApplication({
         emailAddress,
-        lastExitUrl: 'arrival_info',
+        lastExitUrl: 'arrival-info',
       });
 
       const ethiopiaVisaApplicationResult =
@@ -82,10 +82,15 @@ const ethiopiaVisaDetailsController = {
         );
 
       try {
-        await sendEthiopiaApplicationConfirmation(ethiopiaVisaApplicationResult._id);
+        await sendEthiopiaApplicationConfirmation(
+          ethiopiaVisaApplicationResult._id
+        );
         console.log('Application confirmation email sent successfully');
       } catch (emailError) {
-        console.error('Error sending application confirmation email:', emailError);
+        console.error(
+          'Error sending application confirmation email:',
+          emailError
+        );
         // Continue with the response even if email fails
       }
 
