@@ -5,7 +5,7 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 214
         }
       ],
       "attachments": [
@@ -21,7 +21,7 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 114
         }
       ],
       "attachments": [
@@ -36,7 +36,7 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 124
         }
       ],
       "attachments": ["Passport", "Photo"]
@@ -46,19 +46,19 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 124
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 214
         },
         {
           "type": "Multiple Entry 6 Months",
-          "price": 350
+          "price": 314
         },
         {
           "type": "Multiple Entry 1 Year",
-          "price": 600
+          "price": 564
         }
       ],
       "attachments": ["Passport", "Photo", "Support Letter"]
@@ -68,15 +68,15 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 164
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 214
         },
         {
           "type": "Multiple Entry 6 Months",
-          "price": 350
+          "price": 464
         }
       ],
       "attachments": ["Passport", "Photo", "Application Letter"]
@@ -86,11 +86,11 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 264
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 664
         }
       ],
       "attachments": [
@@ -105,11 +105,11 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 464
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 1064
         }
       ],
       "attachments": [
@@ -125,11 +125,11 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 164
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 364
         }
       ],
       "attachments": [
@@ -143,7 +143,7 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 124
         }
       ],
       "attachments": [
@@ -157,11 +157,11 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 214
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 364
         }
       ],
       "attachments": [
@@ -175,7 +175,7 @@
       "validities": [
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 264
         }
       ],
       "attachments": [
@@ -189,11 +189,11 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 144
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 264
         }
       ],
       "attachments": [
@@ -207,19 +207,19 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 164
         },
         {
           "type": "Multiple Entry 90 Days",
-          "price": 200
+          "price": 264
         },
         {
           "type": "Multiple Entry 6 Months",
-          "price": 350
+          "price": 414
         },
         {
           "type": "Multiple Entry 1 Year",
-          "price": 600
+          "price": 564
         }
       ],
       "attachments": [
@@ -234,7 +234,7 @@
       "validities": [
         {
           "type": "Single Entry 30 Days",
-          "price": 100
+          "price": 214
         }
       ],
       "attachments": [

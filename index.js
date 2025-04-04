@@ -132,7 +132,7 @@ app.use(
 );
 app.use('/evisapayment', paymentVisaApplicationRouter);
 
-sendMailEveryDayForPendingPayment();
+// sendMailEveryDayForPendingPayment();
 
 app.use('/api', visaBookingRouter);
 

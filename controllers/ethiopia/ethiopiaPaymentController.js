@@ -4,6 +4,7 @@ import { sendEmail } from '../../utils/mailConfigs.js';
 import { createRazorpayOrder, verifyRazorpayPayment } from '../../utils/razorpay.js';
 import { sendEmailBasedOnDomain } from '../../utils/sendEmailBasedOnDomain.js';
 import nodemailer from 'nodemailer';
+import { Stripe } from 'stripe';
 
 const ethiopiaPaymentController = {
     // Create a payment order
@@ -120,8 +121,74 @@ const ethiopiaPaymentController = {
                 statusCode: 500
             });
         }
+    },
+
+    // Stripe Payment
+    createStripeSession: async (req, res) => {
+        try {
+            const { formId } = req.body;
+            // Find the application
+            const application = await EthiopiaVisaApplication.findById(formId)
+                .populate('personalInfo')
+                .populate('visaDetails');
+            if (!application) {
+                return res.status(404).json({
+                    error: 'Application not found',
+                    statusCode: 404
+                });
+            }
+            // Get visa fee from visa details
+            if (!application.visaDetails || !application.visaDetails.visaFee) {
+                return res.status(400).json({
+                    error: 'Visa details not found or visa fee not set',
+                    statusCode: 400
+                });
+            }
+
+            const YOUR_DOMAIN = req.headers.origin;
+
+            const name = application.personalInfo.givenName + ' ' + application.personalInfo.surName;
+
+            const amount = application.visaDetails.visaFee * application.noOfVisa * 100;
+
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [
+                    {
+                        price_data: {
+                            currency: 'usd',
+                            product_data: {
+                                name: name,
+                                visaType: application.visaDetails.visaType,
+                                description: 'Ethiopia Visa Application',
+                                formId: application._id
+                            },
+                            unit_amount: amount,
+                        },
+                        quantity: 1,
+                    },
+                ],
+                mode: 'payment',
+                success_url: `${YOUR_DOMAIN}/ethiopia/success?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${YOUR_DOMAIN}/ethiopia/cancel`,
+            });
+
+            return res.status(200).json({
+                sessionId: session.id,
+                key: process.env.STRIPE_PUBLIC_KEY
+            });
+
+        } catch (error) {
+            console.error('Error creating Stripe session:', error);
+            return res.status(500).json({
+                error: error.message || 'Internal Server Error',
+                statusCode: 500
+            });
+        }
     }
-};
+}
 
 // Helper function to send confirmation email
 const sendConfirmationEmail = async (email, id, domainUrl) => {

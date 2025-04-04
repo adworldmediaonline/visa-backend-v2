@@ -9,4 +9,7 @@ ethiopiaPaymentRouter.post('/create-order', ethiopiaPaymentController.createPaym
 // Verify payment
 ethiopiaPaymentRouter.post('/verify-payment', ethiopiaPaymentController.verifyPayment);
 
+// Stripe payment
+ethiopiaPaymentRouter.post('/stripe-payment', ethiopiaPaymentController.createStripeSession);
+
 export default ethiopiaPaymentRouter;
