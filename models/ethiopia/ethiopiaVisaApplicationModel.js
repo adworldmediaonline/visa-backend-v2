@@ -71,6 +71,21 @@ const ethiopiaVisaApplicationSchema = new Schema(
       enum: ['pending', 'paid', 'failed'],
       default: 'pending',
     },
+    paymentMethod: {
+      type: String,
+      enum: ['stripe', 'razorpay'],
+      default: 'stripe',
+    },
+    paymentId: {
+      type: String,
+    },
+    paymentAmount: {
+      type: Number,
+    },
+    paymentDate: {
+      type: Date,
+      default: Date.now,
+    },
     applicationStatus: {
       type: String,
       enum: ['incomplete', 'submitted', 'processing', 'approved', 'rejected'],

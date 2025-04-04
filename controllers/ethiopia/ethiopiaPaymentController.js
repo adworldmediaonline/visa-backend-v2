@@ -89,8 +89,12 @@ const ethiopiaPaymentController = {
             const updatedApplication = await EthiopiaVisaApplication.findByIdAndUpdate(
                 formId,
                 {
-                    paymentStatus: 'paid',
-                    applicationStatus: 'submitted'
+                    applicationStatus: 'submitted',
+                    paymentMethod: 'razorpay',
+                    paymentId: session.id,
+                    paymentStatus: session.payment_status,
+                    paymentAmount: session.amount_total / 100,
+                    paymentDate: new Date()
                 },
                 { new: true }
             );
@@ -145,43 +149,130 @@ const ethiopiaPaymentController = {
                 });
             }
 
-            const YOUR_DOMAIN = req.headers.origin;
+            const YOUR_DOMAIN = req.headers.origin || "http://localhost:3000/payment";
 
-            const name = application.personalInfo.givenName + ' ' + application.personalInfo.surName;
+            const name = application.personalInfo.givenName + ' ' + application.personalInfo.surname || '';
+            const email = application.emailAddress || '';
 
             const amount = application.visaDetails.visaFee * application.noOfVisa * 100;
 
-            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
 
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
+                customer_email: email,
                 line_items: [
                     {
                         price_data: {
                             currency: 'usd',
                             product_data: {
                                 name: name,
-                                visaType: application.visaDetails.visaType,
-                                description: 'Ethiopia Visa Application',
-                                formId: application._id
+                                description: `${application.visaDetails.visaType} Visa Application`,
                             },
                             unit_amount: amount,
                         },
                         quantity: 1,
                     },
                 ],
+                metadata: {
+                    applicationId: formId
+                },
                 mode: 'payment',
-                success_url: `${YOUR_DOMAIN}/ethiopia/success?session_id={CHECKOUT_SESSION_ID}`,
-                cancel_url: `${YOUR_DOMAIN}/ethiopia/cancel`,
+                success_url: `${YOUR_DOMAIN}/payment?success=true&session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${YOUR_DOMAIN}/payment?canceled=true`,
             });
 
-            return res.status(200).json({
+            console.log('Stripe Session:', session);
+
+            return res.status(303).json({
                 sessionId: session.id,
+                session_url: session.url,
                 key: process.env.STRIPE_PUBLIC_KEY
             });
 
         } catch (error) {
             console.error('Error creating Stripe session:', error);
+            return res.status(500).json({
+                error: error.message || 'Internal Server Error',
+                statusCode: 500
+            });
+        }
+    },
+
+    // Verify payment and update application status
+    verifyStripePayment: async (req, res) => {
+        try {
+            const { sessionId } = req.body;
+            // Verify the payment
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
+            const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+            if (!session || !session.payment_status || session.payment_status !== 'paid') {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Invalid payment',
+                    statusCode: 400
+                });
+            }
+
+            // Get applicationId from session metadata
+            const applicationId = session.metadata.applicationId;
+            if (!applicationId) {
+                return res.status(400).json({
+                    success: false,
+                    error: 'Application ID not found in payment data',
+                    statusCode: 400
+                });
+            }
+
+            // Find the application
+            const application = await EthiopiaVisaApplication.findById(applicationId);
+            if (!application) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Application not found',
+                    statusCode: 404
+                });
+            }
+
+            // Update application status
+            const updatedApplication = await EthiopiaVisaApplication.findByIdAndUpdate(
+                application._id,
+                {
+                    applicationStatus: 'submitted',
+                    paymentMethod: 'stripe',
+                    paymentId: session.id,
+                    paymentStatus: session.payment_status,
+                    paymentAmount: session.amount_total / 100,
+                    paymentDate: new Date()
+                },
+                { new: true }
+            );
+
+            if (!updatedApplication) {
+                return res.status(404).json({
+                    success: false,
+                    error: 'Application not found',
+                    statusCode: 404
+                });
+            }
+
+            // Send confirmation email
+            sendConfirmationEmail(
+                application.personalInfo.email,
+                application._id,
+                req.headers.origin
+            );
+
+            return res.status(200).json({
+                success: true,
+                applicationId: updatedApplication._id,
+                message: 'Payment verified and application status updated',
+                statusCode: 200
+            });
+
+        } catch (error) {
+            console.error('Error verifying payment:', error);
             return res.status(500).json({
                 error: error.message || 'Internal Server Error',
                 statusCode: 500
