@@ -184,7 +184,7 @@ const ethiopiaPaymentController = {
 
             console.log('Stripe Session:', session);
 
-            return res.status(303).json({
+            return res.status(200).json({
                 sessionId: session.id,
                 session_url: session.url,
                 key: process.env.STRIPE_PUBLIC_KEY
