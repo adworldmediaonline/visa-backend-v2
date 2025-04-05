@@ -39,6 +39,40 @@ const emailConfig = {
       </div>`,
     },
 
+    paymentReminder: {
+      subject: 'Reminder: Pending Payment for {$Countryname} {$visa_name} #{$appid}',
+      template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
+        <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>
+          <div style='text-align: center; background-color: #F5F5F5; padding: 10px; margin:10px; border-radius: 8px;'>
+            <p style='color: #0b5099; margin-top: 12px; font-size:20px; font-weight: bold;'>{$Countryname} {$visa_name} Application</p>
+          </div>
+        </div>
+        <div style='background-color: #ffffff; padding: 25px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <h4 style='color: #515763; margin-top: 0;'>Dear {$firstname} {$lastname},</h4>
+          <p style='margin-bottom: 15px;'>Thank you for choosing {$company_name} for your {$Countryname} {$visa_name} application.</p>
+          <div style='background-color: #f5f5f5; padding: 12px; border-left: 4px solid #515763; margin: 15px 0;'>
+            <p style='margin: 5px 0;'>Application Reference: {$appid}</p>
+          </div>
+          <p style='margin-bottom: 15px;'>We have received your application; however, the payment for the processing is still pending.</p>
+          <div style='margin: 20px 0;'>
+            <p style='margin-bottom: 10px;'>Please use the link below to complete your payment and avoid any delays in processing your {$visa_name} application.</p>
+            <a href='{$paymentUrl}' style='background-color:rgb(0, 79, 48); color: white; text-decoration: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; display: inline-block;'>Click here to make payment</a>
+          </div>
+          <p style='color: #666; font-style: italic;'>If you face any issues while making the payment, please contact our support team at <a href='mailto:{$support_email}' style='color: #515763; text-decoration: none;'>{$support_email}</a></p>
+          <p>Best regards,<br> Customer Service Dept.<br> <a href='{$website_url}' style='color: #515763; text-decoration: none;'>{$website_url}</a></p>
+        </div>
+        <div style='text-align: center; background-color: #0b5099; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 15px; color: #ffffff; font-size: 14px;'>
+          <strong>Contact Us:</strong><br>
+          <strong>Email</strong>: <a href='mailto:{$support_email}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_email}</a><br>
+          <strong>Telephone</strong>: <a href='tel:{$support_phone}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_phone_display}</a>
+        </div>
+        <div style='margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 4px; text-align: center;'>
+          <p style='font-size: 14px;'>© ${new Date().getFullYear()} {$company_name}. All rights reserved.</p>
+        </div>
+      </div>`,
+    },
+
     docsRemainder: {
       subject:
         'Reminder: Pending Documents for {$Countryname} {$visa_name} #{$appid}',
@@ -264,8 +298,9 @@ async function prepareEthiopiaVisaEmail(
     const YOUR_DOMAIN = 'https://www.ethiopiatravelapplication.com/';
 
     // Prepare document URL for the application
-    const documentUrl = `${YOUR_DOMAIN}/ethiopia/application/${applicationId}/documents`;
-    const statusUrl = `${YOUR_DOMAIN}/ethiopia/status/${applicationId}`;
+    const documentUrl = `${YOUR_DOMAIN}docs/${applicationId}`;
+    const statusUrl = `${YOUR_DOMAIN}status`;
+    const paymentUrl = `${YOUR_DOMAIN}payment/${applicationId}`;
 
     // Prepare template data
     const templateData = {
@@ -278,6 +313,7 @@ async function prepareEthiopiaVisaEmail(
       visa_name: visaType,
       statusUrl,
       documentUrl,
+      paymentUrl,
       emailAddress: application.emailAddress,
       ...additionalData,
     };
@@ -349,6 +385,14 @@ async function sendEthiopiaDocumentReminder(applicationId) {
   return await sendEmail(emailData);
 }
 
+async function sendEthiopiaPaymentReminder(applicationId) {
+  const emailData = await prepareEthiopiaVisaEmail(
+    applicationId,
+    'paymentReminder'
+  );
+  return await sendEmail(emailData);
+}
+
 /**
  * Sends passport reminder email for Ethiopia visa application
  * @param {string} applicationId - Ethiopia visa application ID
@@ -411,6 +455,7 @@ export {
   prepareEthiopiaVisaEmail,
   sendEmail,
   sendEthiopiaDocumentReminder,
+  sendEthiopiaPaymentReminder,
   sendEthiopiaPassportReminder,
   sendEthiopiaPhotoReminder,
   sendEthiopiaApplicationConfirmation,

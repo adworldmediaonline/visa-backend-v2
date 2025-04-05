@@ -60,7 +60,7 @@ const ethiopiaPassportInfoController = {
           { _id: formId },
           {
             passportInfo: ethiopiaPassportInfoResult._id,
-            lastExitUrl: 'additional-applicants',
+            lastExitUrl: 'review',
           },
           { new: true }
         );

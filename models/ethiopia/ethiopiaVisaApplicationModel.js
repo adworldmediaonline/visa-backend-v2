@@ -20,6 +20,7 @@ const ethiopiaVisaApplicationSchema = new Schema(
     lastExitUrl: {
       type: String,
       true: true,
+      default: 'visa-details',
       lowercase: true,
     },
     visaDetails: {

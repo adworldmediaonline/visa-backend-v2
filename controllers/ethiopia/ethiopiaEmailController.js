@@ -5,7 +5,8 @@ import {
     sendEthiopiaPassportReminder,
     sendEthiopiaPhotoReminder,
     sendEthiopiaApplicationConfirmation,
-    sendEthiopiaSpecificDocumentReminder
+    sendEthiopiaSpecificDocumentReminder,
+    sendEthiopiaPaymentReminder
 } from '../../utils/mailConfigs.js';
 
 /**
@@ -30,6 +31,27 @@ const sendDocumentReminderEmail = expressAsyncHandler(async (req, res) => {
         });
     }
 });
+
+const sendPaymentRemaiderEmail = expressAsyncHandler(async (req, res) => {
+    try {
+        const { applicationId } = req.params;
+
+        const result = await sendEthiopiaPaymentReminder(applicationId);
+
+        res.status(StatusCodes.OK).json({
+            success: true,
+            message: 'Payment reminder email sent successfully',
+            data: result
+        });
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: 'Error sending payment reminder email',
+            error: error.message
+        });
+    }
+});
+
 
 /**
  * Send passport reminder email for Ethiopia visa application
@@ -133,6 +155,7 @@ const sendSpecificDocumentReminderEmail = expressAsyncHandler(async (req, res) =
 
 export {
     sendDocumentReminderEmail,
+    sendPaymentRemaiderEmail,
     sendPassportReminderEmail,
     sendPhotoReminderEmail,
     sendApplicationConfirmationEmail,

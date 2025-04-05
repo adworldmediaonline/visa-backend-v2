@@ -81,10 +81,10 @@ const ethiopiaPaymentController = {
           formId,
           {
             applicationStatus: 'submitted',
+            lastExitUrl: 'attachments',
+            paymentStatus: 'paid',
             paymentMethod: 'razorpay',
-            paymentId: session.id,
-            paymentStatus: session.payment_status,
-            paymentAmount: session.amount_total / 100,
+            paymentId: paymentId,
             paymentDate: new Date(),
           },
           { new: true }
@@ -143,8 +143,8 @@ const ethiopiaPaymentController = {
 
       const name =
         application.personalInfo.givenName +
-          ' ' +
-          application.personalInfo.surname || '';
+        ' ' +
+        application.personalInfo.surname || '';
       const email = application.emailAddress || '';
 
       const amount =
@@ -239,6 +239,7 @@ const ethiopiaPaymentController = {
           {
             applicationStatus: 'submitted',
             paymentMethod: 'stripe',
+            lastExitUrl: 'attachments',
             paymentId: session.id,
             paymentStatus: session.payment_status,
             paymentAmount: session.amount_total / 100,
