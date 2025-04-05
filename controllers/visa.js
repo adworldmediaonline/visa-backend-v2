@@ -184,6 +184,7 @@ const visaRequestFormController = {
       res.json({ error: error, statusCode: 500 });
     }
   },
+
   viewAllVisaRequestForm: async (req, res) => {
     try {
       const form = await VisaRequestForm.find()

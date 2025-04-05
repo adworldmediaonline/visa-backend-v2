@@ -43,6 +43,7 @@ import ethiopiaDocumentsRoute from './routes/ethiopia/ethiopiaDocumentsRoute.js'
 import mailRouter from './routes/ethiopia/ethiopiaEmailRoutes.js';
 import ethiopiaPaymentRouter from './routes/ethiopia/ethiopiaPaymentRoutes.js';
 import ethiopiaGovRefDetailsRouter from './routes/ethiopia/ethiopiaGovRefDetailsRoute.js';
+import indiaVisaRouter from './routes/indiaVisa/indiaVisaApplicationRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -135,6 +136,7 @@ app.use('/evisapayment', paymentVisaApplicationRouter);
 sendMailEveryDayForPendingPayment();
 
 app.use('/api', visaBookingRouter);
+app.use('/api/v1/india-visa', indiaVisaRouter);
 
 // for admin dashboard
 app.use('/api/v1/blogs', blogsRouter);
