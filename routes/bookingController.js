@@ -43,6 +43,7 @@ const createVisaCheckoutSession = async (req, res, next) => {
       visaBookingModel.visaService,
       visaBookingModel.eTouristVisa
     );
+    // const finalVisaPrice = 1;
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -50,7 +51,7 @@ const createVisaCheckoutSession = async (req, res, next) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Visa Booking',
+              name: 'India E-Visa',
             },
             unit_amount: finalVisaPrice * 100,
             // unit_amount: 35 * 100,

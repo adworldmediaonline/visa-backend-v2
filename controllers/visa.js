@@ -51,7 +51,7 @@ const visaRequestFormController = {
         from: HOSTINGER_EMAIL,
         to: data.emailId,
         subject: 'temporary ID.',
-        text: `Dear Sir/Madam,\n\nYour partially filled data has been saved successfully. Please note down the Temporary Application ID: ${data._id}\n\n(Application ID required)`,
+        text: `Dear Sir/Madam,\n\nYour partially filled data has been saved successfully. Please note down the Temporary Application ID: ${data._id}`,
       };
 
       try {
@@ -151,12 +151,11 @@ const visaRequestFormController = {
           const mailOptions = {
             ...commonMailOptions,
             to: form.emailId,
-            text: `Dear Sir/Madam,\n\nYour payment is pending. Please complete the payment to proceed.. Please note down the Temporary Application ID: ${form._id}\n\n(Application ID required)`,
+            text: `Dear Sir/Madam,\n\nYour payment is pending. Please complete the payment to proceed.. Please note down the Temporary Application ID: ${form._id}`,
             html: `
           <p>Dear Sir/Madam,</p>
           <p>Your payment is pending. Please complete the payment to proceed.</p>
           <p>Please note down the Temporary Application ID: ${form._id}</p>
-          <p>(Application ID required)</p>
           <p>Before completing the payment, you can visit our <a href="https://e-visa-delta.vercel.app">home page</a> to fill out the partially completed form using your Application ID.</p>
           <p>Click <a href="https://e-visa-delta.vercel.app">here</a> to complete the payment after filling out the form.</p>`,
           };
@@ -278,7 +277,7 @@ const visaRequestFormController = {
           from: HOSTINGER_EMAIL,
           to: updatedForm.emailId,
           subject: 'temporary ID.',
-          text: `Dear Sir/Madam,\n\nYour form is incomplete. Please note down the Temporary Application ID: ${updatedForm._id}\n\n(Application ID required) and completed the form`,
+          text: `Dear Sir/Madam,\n\nYour form is incomplete. Please note down the Temporary Application ID: ${updatedForm._id}`,
         };
 
         try {
@@ -327,7 +326,7 @@ const visaRequestFormController = {
           from: HOSTINGER_EMAIL,
           to: updatedForm.emailId,
           subject: 'temporary ID.',
-          text: `Dear Sir/Madam,\n\nYour form is incomplete. Please note down the Temporary Application ID: ${updatedForm._id}\n\n(Application ID required) and completed the form`,
+          text: `Dear Sir/Madam,\n\nYour form is incomplete. Please note down the Temporary Application ID: ${updatedForm._id}`,
         };
 
         try {
@@ -389,7 +388,7 @@ const visaRequestFormController = {
         from: HOSTINGER_EMAIL,
         to: data.emailId,
         subject: 'temporary ID.',
-        text: `Dear Sir/Madam,\n\nYour payment completed successfully. Please note down the Temporary Application ID: ${data._id}\n\n(Application ID required)`,
+        text: `Dear Sir/Madam,\n\nYour payment completed successfully. Please note down the Temporary Application ID: ${data._id}`,
       };
 
       try {
