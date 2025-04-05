@@ -71,7 +71,7 @@ const visaRequestFormController6 = {
             from: HOSTINGER_EMAIL,
             to: updatedForm.emailId,
             subject: 'temporary ID.',
-            text: `Dear Sir/Madam,\n\nYou uploaded document almost hour ago and not completed your payment. Please note down the Temporary Application ID: ${updatedForm._id}\n\n(Application ID required)`,
+            text: `Dear Sir/Madam,\n\nYou uploaded document almost hour ago and not completed your payment. Please note down the Temporary Application ID: ${updatedForm._id}\n\n`,
           };
 
           try {

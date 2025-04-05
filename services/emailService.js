@@ -55,18 +55,20 @@ const sendPendingPaymentEmails = async res => {
         console.log(
           `Sending email for ${form.emailId} because expectedDateOfArrival is a future date`
         );
-
+        // TODO: Add the below detail with proper domain
+        {
+          /* <p>Before completing the payment, you can visit our <a href="https://e-visa-delta.vercel.app">home page</a> to fill out the partially completed form using your Application ID.</p>
+          <p>Click <a href="https://e-visa-delta.vercel.app">here</a> to complete the payment after filling out the form.</p> */
+        }
         const mailOptions = {
           ...commonMailOptions,
           to: form.emailId,
-          text: `Dear Sir/Madam,\n\nYour payment is pending. Please complete the payment to proceed.. Please note down the Temporary Application ID: ${form._id}\n\n(Application ID required)`,
+          text: `Dear Sir/Madam,\n\nYour payment is pending. Please complete the payment to proceed.. Please note down the Temporary Application ID: ${form._id}`,
           html: `
           <p>Dear Sir/Madam,</p>
           <p>Your payment is pending. Please complete the payment to proceed.</p>
           <p>Please note down the Temporary Application ID: ${form._id}</p>
-          <p>(Application ID required)</p>
-          <p>Before completing the payment, you can visit our <a href="https://e-visa-delta.vercel.app">home page</a> to fill out the partially completed form using your Application ID.</p>
-          <p>Click <a href="https://e-visa-delta.vercel.app">here</a> to complete the payment after filling out the form.</p>`,
+          `,
         };
 
         try {
