@@ -40,7 +40,8 @@ const emailConfig = {
     },
 
     paymentReminder: {
-      subject: 'Reminder: Pending Payment for {$Countryname} {$visa_name} #{$appid}',
+      subject:
+        'Reminder: Pending Payment for {$Countryname} {$visa_name} #{$appid}',
       template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
         <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
           <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>

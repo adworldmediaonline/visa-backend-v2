@@ -143,8 +143,8 @@ const ethiopiaPaymentController = {
 
       const name =
         application.personalInfo.givenName +
-        ' ' +
-        application.personalInfo.surname || '';
+          ' ' +
+          application.personalInfo.surname || '';
       const email = application.emailAddress || '';
 
       const amount =

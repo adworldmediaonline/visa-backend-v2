@@ -46,6 +46,7 @@ const createVisaCheckoutSession = async (req, res, next) => {
     // const finalVisaPrice = 1;
 
     const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -107,15 +108,20 @@ const webhookCheckout = async (req, res) => {
           price,
           paid: true,
           termsAndConditions,
+          paymentMethod: 'stripe',
+          paymentId: session.id,
+          paymentStatus: session.payment_status,
+          paymentAmount: session.amount_total / 100,
+          paymentDate: new Date(),
         },
         { new: true }
       );
 
-      console.log('sendConfirmationEmail');
+      // console.log('sendConfirmationEmail');
       await sendConfirmationEmail(user.emailId, orderId, domainUrl);
     }
 
-    console.log('received: true');
+    // console.log('received: true');
     res.status(200).json({ received: true });
   } catch (err) {
     console.error(err);
@@ -145,9 +151,12 @@ const sendConfirmationEmail = async (email, id, domainUrl) => {
     const mailOptions = {
       from: HOSTINGER_EMAIL,
       to: email,
-      subject: 'Payment Confirmation',
-      html: `<p>Dear ${email},</p>
-             <p>Thank you for your payment. Your payment has been received.</p> Please note down the  Application ID: ${id}`,
+      subject: 'India eVisa Payment Confirmation',
+      html: `<p>Dear Applicant,</p>
+             <p>Thank you for your payment. Your India eVisa application has been received and is now being processed.</p>
+             <p>Your Application ID: <strong>${id}</strong></p>
+             <p>Please keep this ID for future reference. You will be notified via email about the status of your application.</p>
+             <p>Best regards,<br>India eVisa Team</p>`,
     };
 
     try {

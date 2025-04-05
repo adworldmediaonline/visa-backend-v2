@@ -110,6 +110,29 @@ const visaRequestFormSchema = new mongoose.Schema(
       type: String,
     },
 
+    // payment related fields
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ['stripe', 'razorpay'],
+      default: 'stripe',
+    },
+    paymentId: {
+      type: String,
+    },
+    paymentAmount: {
+      type: Number,
+    },
+    paymentDate: {
+      type: Date,
+      default: Date.now,
+    },
+
     step2: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm2' },
     step3: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm3' },
     step4: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm4' },
