@@ -4,13 +4,15 @@ import {
     sendPassportReminderEmail,
     sendPhotoReminderEmail,
     sendApplicationConfirmationEmail,
-    sendSpecificDocumentReminderEmail
+    sendSpecificDocumentReminderEmail,
+    sendPaymentRemaiderEmail
 } from '../../controllers/ethiopia/ethiopiaEmailController.js';
 
 const mailRouter = express.Router();
 
 // Email routes for Ethiopia visa applications
 mailRouter.post('/documents-reminder/:applicationId', sendDocumentReminderEmail);
+mailRouter.post('/payment-reminder/:applicationId', sendPaymentRemaiderEmail);
 mailRouter.post('/passport-reminder/:applicationId', sendPassportReminderEmail);
 mailRouter.post('/photo-reminder/:applicationId', sendPhotoReminderEmail);
 mailRouter.post('/application-confirmation/:applicationId', sendApplicationConfirmationEmail);
