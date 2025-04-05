@@ -189,13 +189,13 @@ const emailConfig = {
 
   // Default values for template variables
   defaults: {
-    company_name: 'test',
+    company_name: 'Ethiopia Travel Application',
     logo_url:
       'https://media.istockphoto.com/id/1400103307/vector/flag-of-ethiopia.jpg?s=2048x2048&w=is&k=20&c=lf9slNEFBG_tCtM5w4ZXpM1wcrexWJmBwD-bK2gT2Lc=',
-    support_email: 'support@test.com',
+    support_email: 'support@ethiopiatravelapplication.com',
     support_phone: '+18883693111',
     support_phone_display: 'United States +1 888 369 3111',
-    website_url: 'https://test.com',
+    website_url: 'https://www.ethiopiatravelapplication.com/',
   },
 };
 /**
@@ -261,7 +261,7 @@ async function prepareEthiopiaVisaEmail(
     const visaDetails = application.visaDetails || {};
     const visaType = visaDetails.visaType || 'Visa';
 
-    const YOUR_DOMAIN = 'https://www.test.com';
+    const YOUR_DOMAIN = 'https://www.ethiopiatravelapplication.com/';
 
     // Prepare document URL for the application
     const documentUrl = `${YOUR_DOMAIN}/ethiopia/application/${applicationId}/documents`;
