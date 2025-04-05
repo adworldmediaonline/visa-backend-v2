@@ -1,8 +1,7 @@
 const indianTouristVisaPrices = [
   {
     country: 'Albania',
-    // prices: { visa30days: 25, visa1Year: 40, visa5Years: 80 },
-    prices: { visa30days: 1, visa1Year: 1, visa5Years: 1 },
+    prices: { visa30days: 25, visa1Year: 40, visa5Years: 80 },
   },
   {
     country: 'Andorra',
