@@ -36,6 +36,7 @@ const visaRequestFormController6 = {
         {
           step6: visaRequestForm6._id,
           lastExitStepUrl: '/visa/step-seven',
+          visaStatus: 'hold on',
         },
         {
           new: true,

@@ -16,6 +16,7 @@ const visaRequestFormController3 = {
         {
           step3: result._id,
           lastExitStepUrl: '/visa/step-four',
+          visaStatus: 'incomplete',
         },
         {
           new: true,

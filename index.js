@@ -28,8 +28,6 @@ import moroccoVisaApplicationRouter from './routes/morocco/moroccoVisaApplicatio
 import moroccoVisaApplicationPeopleRouter from './routes/morocco/moroccoVisaApplicationPeopleRoute.js';
 import paymentVisaApplicationRouter from './routes/payment/paymentRoute.js';
 import touristIndividualPersonsRouter from './routes/srilanka/touristIndividual/touristIndividualPersons.js';
-import visaBookingRouter from './routes/visaBookingRoute.js';
-import { webhookCheckout } from './routes/bookingController.js';
 import servicesIndiaTravelVisaRouter from './routes/servicesIndiaTravelVisaRoutes.js';
 import travelToIndiaServicesVisaRouter from './routes/travelToIndiaServicesVisaRoutes.js';
 import indiaTravelServicesVisaRouter from './routes/indiaTravelServicesVisaRoutes.js';
@@ -44,6 +42,8 @@ import mailRouter from './routes/ethiopia/ethiopiaEmailRoutes.js';
 import ethiopiaPaymentRouter from './routes/ethiopia/ethiopiaPaymentRoutes.js';
 import ethiopiaGovRefDetailsRouter from './routes/ethiopia/ethiopiaGovRefDetailsRoute.js';
 import indiaVisaRouter from './routes/indiaVisa/indiaVisaApplicationRoute.js';
+import { webhookCheckout } from './controllers/indiaVisa/paymentIndiaVisaController.js';
+import indiaVisaPaymentRouter from './routes/indiaVisa/paymentIndiaVisaRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -51,13 +51,6 @@ dbConnect();
 const port = process.env.PORT || 8000;
 
 const app = express();
-
-// webhook indian visa payment code start here
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  webhookCheckout
-);
 
 // webhook indian visa payment code end here
 
@@ -135,8 +128,14 @@ app.use('/evisapayment', paymentVisaApplicationRouter);
 
 sendMailEveryDayForPendingPayment();
 
-app.use('/api', visaBookingRouter);
+// india visa routes
 app.use('/api/v1/india-visa', indiaVisaRouter);
+app.use('/api/v1/india-visa/payments', indiaVisaPaymentRouter);
+app.post(
+  '/api/v1/india-visa/payments/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  webhookCheckout
+);
 
 // for admin dashboard
 app.use('/api/v1/blogs', blogsRouter);

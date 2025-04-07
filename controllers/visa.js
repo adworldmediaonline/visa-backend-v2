@@ -26,6 +26,7 @@ const visaRequestFormController = {
 
       const visaRequestForms = new VisaRequestForm({
         ...req.body,
+        visaStatus: 'incomplete',
         lastExitStepUrl: '/visa/step-two',
       });
 

@@ -86,9 +86,36 @@ const visaRequestFormSchema = new mongoose.Schema(
       default: '/',
     },
 
+    // application status
     visaStatus: {
       type: String,
+      enum: [
+        'incomplete',
+        'submitted',
+        'pending document',
+        'on hold',
+        'pending',
+        'form filled',
+        'processed',
+        'future processing',
+        'visa granted',
+        'visa email sent',
+        'escalated',
+        'visa declined',
+        'refund pending',
+        'refund completed',
+        'payment disputed',
+        'miscellaneous',
+        'not interested',
+        'chargeback',
+      ],
       default: 'incomplete',
+    },
+
+    // payment related fields
+    price: {
+      type: Number,
+      default: 0,
     },
 
     paid: {
@@ -96,21 +123,6 @@ const visaRequestFormSchema = new mongoose.Schema(
       default: false,
     },
 
-    price: {
-      type: Number,
-      default: 0,
-    },
-
-    termsAndConditions: {
-      type: Boolean,
-      default: false,
-    },
-
-    termsAndConditionsContent: {
-      type: String,
-    },
-
-    // payment related fields
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed'],
@@ -122,15 +134,27 @@ const visaRequestFormSchema = new mongoose.Schema(
       enum: ['stripe', 'razorpay'],
       default: 'stripe',
     },
+
     paymentId: {
       type: String,
     },
+
     paymentAmount: {
       type: Number,
     },
+
     paymentDate: {
       type: Date,
       default: Date.now,
+    },
+
+    termsAndConditions: {
+      type: Boolean,
+      default: false,
+    },
+
+    termsAndConditionsContent: {
+      type: String,
     },
 
     step2: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm2' },
