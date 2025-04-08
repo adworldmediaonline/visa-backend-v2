@@ -145,14 +145,14 @@ const createIndiaVisaCheckoutSession = async (req, res, next) => {
       termsAndConditions,
       termsAndConditionsContent,
     });
-
+    // TODO: Uncomment this after testing
     // const finalVisaPrice = indianVisaPaymentFinalPrice(
     //   35,
     //   indiaVisaModel.nationalityRegion,
     //   indiaVisaModel.visaService,
     //   indiaVisaModel.eTouristVisa
     // );
-
+    // TODO: Remove this after testing
     const finalVisaPrice = 1;
 
     const sessionParams = {
