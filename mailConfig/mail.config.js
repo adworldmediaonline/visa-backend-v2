@@ -37,18 +37,15 @@ const createTransporter = async domainUrl => {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
-      secure: process.env.SMTP_SECURE === 'true',
+      secure: false,
       auth: {
         user: HOSTINGER_EMAIL,
         pass: HOSTINGER_PASSWORD,
       },
-      tls: {
-        ciphers: 'TLSv1.2',
-        rejectUnauthorized: false, // Less strict for production environments
-      },
+      tls: { ciphers: 'TLSv1.2' },
       requireTLS: true,
+      debug: true,
       connectionTimeout: 10000,
-      debug: process.env.NODE_ENV === 'development',
     });
 
     // Verify connection configuration

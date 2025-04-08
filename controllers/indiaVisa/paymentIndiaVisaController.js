@@ -6,7 +6,7 @@ import {
   sendAdminAlert,
 } from '../../mailConfig/mail.config.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE);
 
 // Queue for failed payment processing tasks
 const paymentProcessingQueue = [];
@@ -269,13 +269,13 @@ const webhookCheckout = async (req, res) => {
 
       console.log(
         'Using webhook secret:',
-        process.env.STRIPE_WEBHOOK_SECRET_TEST ? 'Present' : 'Missing'
+        process.env.STRIPE_WEBHOOK_SECRET_LIVE ? 'Present' : 'Missing'
       );
 
       event = stripe.webhooks.constructEvent(
         rawBody,
         signature,
-        process.env.STRIPE_WEBHOOK_SECRET_TEST
+        process.env.STRIPE_WEBHOOK_SECRET_LIVE
       );
       console.log('Webhook event verified:', event.type);
     } catch (err) {
