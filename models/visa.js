@@ -86,9 +86,36 @@ const visaRequestFormSchema = new mongoose.Schema(
       default: '/',
     },
 
+    // application status
     visaStatus: {
       type: String,
+      enum: [
+        'incomplete',
+        'submitted',
+        'pending document',
+        'on hold',
+        'pending',
+        'form filled',
+        'processed',
+        'future processing',
+        'visa granted',
+        'visa email sent',
+        'escalated',
+        'visa declined',
+        'refund pending',
+        'refund completed',
+        'payment disputed',
+        'miscellaneous',
+        'not interested',
+        'chargeback',
+      ],
       default: 'incomplete',
+    },
+
+    // payment related fields
+    price: {
+      type: Number,
+      default: 0,
     },
 
     paid: {
@@ -96,9 +123,33 @@ const visaRequestFormSchema = new mongoose.Schema(
       default: false,
     },
 
-    price: {
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+
+    paymentFailureReason: {
+      type: String,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ['stripe', 'razorpay'],
+      default: 'stripe',
+    },
+
+    paymentId: {
+      type: String,
+    },
+
+    paymentAmount: {
       type: Number,
-      default: 0,
+    },
+
+    paymentDate: {
+      type: Date,
+      default: Date.now,
     },
 
     termsAndConditions: {
@@ -108,29 +159,6 @@ const visaRequestFormSchema = new mongoose.Schema(
 
     termsAndConditionsContent: {
       type: String,
-    },
-
-    // payment related fields
-    paymentStatus: {
-      type: String,
-      enum: ['pending', 'paid', 'failed'],
-      default: 'pending',
-    },
-
-    paymentMethod: {
-      type: String,
-      enum: ['stripe', 'razorpay'],
-      default: 'stripe',
-    },
-    paymentId: {
-      type: String,
-    },
-    paymentAmount: {
-      type: Number,
-    },
-    paymentDate: {
-      type: Date,
-      default: Date.now,
     },
 
     step2: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm2' },

@@ -16,6 +16,7 @@ const visaRequestFormController5 = {
         {
           step5: result._id,
           lastExitStepUrl: '/visa/step-six',
+          visaStatus: 'pending document',
         },
         {
           new: true,

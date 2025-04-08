@@ -28,8 +28,6 @@ import moroccoVisaApplicationRouter from './routes/morocco/moroccoVisaApplicatio
 import moroccoVisaApplicationPeopleRouter from './routes/morocco/moroccoVisaApplicationPeopleRoute.js';
 import paymentVisaApplicationRouter from './routes/payment/paymentRoute.js';
 import touristIndividualPersonsRouter from './routes/srilanka/touristIndividual/touristIndividualPersons.js';
-import visaBookingRouter from './routes/visaBookingRoute.js';
-import { webhookCheckout } from './routes/bookingController.js';
 import servicesIndiaTravelVisaRouter from './routes/servicesIndiaTravelVisaRoutes.js';
 import travelToIndiaServicesVisaRouter from './routes/travelToIndiaServicesVisaRoutes.js';
 import indiaTravelServicesVisaRouter from './routes/indiaTravelServicesVisaRoutes.js';
@@ -44,23 +42,51 @@ import mailRouter from './routes/ethiopia/ethiopiaEmailRoutes.js';
 import ethiopiaPaymentRouter from './routes/ethiopia/ethiopiaPaymentRoutes.js';
 import ethiopiaGovRefDetailsRouter from './routes/ethiopia/ethiopiaGovRefDetailsRoute.js';
 import indiaVisaRouter from './routes/indiaVisa/indiaVisaApplicationRoute.js';
+import { webhookCheckout } from './controllers/indiaVisa/paymentIndiaVisaController.js';
+import indiaVisaPaymentRouter from './routes/indiaVisa/paymentIndiaVisaRoute.js';
 
 dotenv.config();
 dbConnect();
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8090;
 
 const app = express();
 
-// webhook indian visa payment code start here
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  webhookCheckout
-);
+// CRITICAL: Debug logging middleware for all incoming requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
+});
 
-// webhook indian visa payment code end here
+// IMPORTANT: Webhook routes MUST be defined BEFORE any body parsers
+// These routes get the raw request body needed for signature verification
+// Define multiple webhook paths with both variations (with/without trailing slash)
+const webhookPaths = [
+  '/api/v1/india-visa/payments/webhook-checkout',
+  '/api/v1/india-visa/payments/webhook-checkout/',
+];
 
+webhookPaths.forEach(path => {
+  app.post(
+    path,
+    express.raw({ type: 'application/json' }),
+    (req, res, next) => {
+      console.log(`Webhook received on path: ${req.path}`);
+      console.log(
+        'Stripe signature:',
+        req.headers['stripe-signature'] ? 'Present' : 'Missing'
+      );
+      console.log('Body type:', typeof req.body);
+      console.log('Body is Buffer:', Buffer.isBuffer(req.body));
+      console.log('Body length:', req.body?.length || 0);
+
+      // Now pass to the actual webhook handler
+      webhookCheckout(req, res);
+    }
+  );
+});
+
+// Regular middleware setup - AFTER the webhook route
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -135,8 +161,10 @@ app.use('/evisapayment', paymentVisaApplicationRouter);
 
 sendMailEveryDayForPendingPayment();
 
-app.use('/api', visaBookingRouter);
+// india visa routes
 app.use('/api/v1/india-visa', indiaVisaRouter);
+app.use('/api/v1/india-visa/payments', indiaVisaPaymentRouter);
+// Webhook route is now defined at the top of the file
 
 // for admin dashboard
 app.use('/api/v1/blogs', blogsRouter);
@@ -154,6 +182,16 @@ app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);
 app.use('/api/v1/mail', mailRouter);
 app.use('/api/v1/ethiopia-visa/payments', ethiopiaPaymentRouter);
 app.use('/api/v1/ethiopia-visa/gov-ref', ethiopiaGovRefDetailsRouter);
+
+// 404 handler
+app.use((req, res) => {
+  console.log(`404 Not Found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    status: 'error',
+    message: 'Route not found',
+    path: req.originalUrl,
+  });
+});
 
 app.listen(port, () => {
   console.log(`Server is running on Port Number: ${port}`);
