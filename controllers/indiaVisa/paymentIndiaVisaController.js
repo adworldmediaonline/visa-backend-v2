@@ -11,8 +11,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
 // Queue for failed payment processing tasks
 const paymentProcessingQueue = [];
 
-// Process the payment queue periodically
-const QUEUE_PROCESSING_INTERVAL = 15 * 60 * 1000; // 15 minutes
+// Process the payment queue more frequently
+const QUEUE_PROCESSING_INTERVAL = 60 * 1000; // 1 minute instead of 15 minutes
 
 // Retry helper with exponential backoff
 const retryOperation = async (
@@ -36,6 +36,61 @@ const retryOperation = async (
   throw lastError;
 };
 
+// Function to process a queue item
+const processQueueItem = async task => {
+  try {
+    console.log(`Processing queued task: ${task.type}`);
+
+    if (task.type === 'completedCheckout') {
+      await handleCompletedCheckout(task.data, true);
+    } else if (task.type === 'failedPayment') {
+      await handleFailedPayment(task.data, true);
+    }
+    console.log(`Successfully processed queued task: ${task.type}`);
+    return true;
+  } catch (error) {
+    console.error(`Failed to process queued task: ${task.type}`, error);
+
+    // If it's the final retry, send an alert
+    if (task.retries >= 3) {
+      try {
+        await sendAdminAlert(
+          'Critical Payment Processing Failure',
+          {
+            taskType: task.type,
+            data: task.data,
+            error: error.message,
+            retryCount: task.retries,
+          },
+          task.data.metadata?.domainUrl
+        );
+      } catch (alertError) {
+        console.error('Failed to send alert for failed task:', alertError);
+      }
+      return false;
+    } else {
+      // Re-queue with incremented retry count
+      paymentProcessingQueue.push({
+        ...task,
+        retries: (task.retries || 0) + 1,
+      });
+      return false;
+    }
+  }
+};
+
+// Process an item immediately without waiting for the queue interval
+const processImmediately = async task => {
+  console.log(`Processing ${task.type} immediately without queueing`);
+  const success = await processQueueItem(task);
+
+  if (!success) {
+    console.log(`Immediate processing failed, item has been queued for retry`);
+  }
+
+  return success;
+};
+
 // Initialize queue processing
 setInterval(async () => {
   if (paymentProcessingQueue.length > 0) {
@@ -45,41 +100,7 @@ setInterval(async () => {
 
     // Take the first item from the queue
     const task = paymentProcessingQueue.shift();
-
-    try {
-      if (task.type === 'completedCheckout') {
-        await handleCompletedCheckout(task.data, true);
-      } else if (task.type === 'failedPayment') {
-        await handleFailedPayment(task.data, true);
-      }
-      console.log(`Successfully processed queued task: ${task.type}`);
-    } catch (error) {
-      console.error(`Failed to process queued task: ${task.type}`, error);
-
-      // If it's the final retry, send an alert
-      if (task.retries >= 3) {
-        try {
-          await sendAdminAlert(
-            'Critical Payment Processing Failure',
-            {
-              taskType: task.type,
-              data: task.data,
-              error: error.message,
-              retryCount: task.retries,
-            },
-            task.data.metadata?.domainUrl || process.env.DEFAULT_DOMAIN_URL
-          );
-        } catch (alertError) {
-          console.error('Failed to send alert for failed task:', alertError);
-        }
-      } else {
-        // Re-queue with incremented retry count
-        paymentProcessingQueue.push({
-          ...task,
-          retries: (task.retries || 0) + 1,
-        });
-      }
-    }
+    await processQueueItem(task);
   }
 }, QUEUE_PROCESSING_INTERVAL);
 
@@ -270,8 +291,21 @@ const webhookCheckout = async (req, res) => {
     console.log('Sending 200 response to Stripe webhook');
     res.status(200).json({ received: true });
 
-    // Process the event asynchronously
-    setTimeout(async () => {
+    // Determine if this event requires database access
+    const requiresDatabase = [
+      'checkout.session.completed',
+      'payment_intent.payment_failed',
+    ].includes(event.type);
+
+    // For events that don't require DB access, process them separately
+    if (!requiresDatabase) {
+      handleNonDatabaseEvent(event);
+      return;
+    }
+
+    // Process the event asynchronously without blocking response
+    // Use a try/catch inside to prevent crashes
+    process.nextTick(async () => {
       try {
         console.log(`Processing webhook event ${event.type} asynchronously`);
 
@@ -281,7 +315,18 @@ const webhookCheckout = async (req, res) => {
               'Handling checkout.session.completed',
               event.data.object.id
             );
-            await handleCompletedCheckout(event.data.object);
+            // Process checkout.session.completed immediately without queueing
+            const success = await processImmediately({
+              type: 'completedCheckout',
+              data: event.data.object,
+              retries: 0,
+            });
+
+            if (!success) {
+              console.log(
+                'Payment processing failed - already queued for retry'
+              );
+            }
             break;
           case 'payment_intent.payment_failed':
             console.log(
@@ -291,38 +336,160 @@ const webhookCheckout = async (req, res) => {
             await handleFailedPayment(event.data.object);
             break;
           default:
-            console.log(`Unhandled event type ${event.type}`);
+            console.log(
+              `Unhandled event type ${event.type} - ID: ${
+                event.id || 'unknown'
+              }`
+            );
         }
       } catch (error) {
         console.error(`Error processing webhook event ${event.type}:`, error);
 
-        // Add to retry queue
-        if (event.type === 'checkout.session.completed') {
-          console.log('Adding completed checkout to retry queue');
-          paymentProcessingQueue.push({
-            type: 'completedCheckout',
-            data: event.data.object,
-            retries: 0,
-          });
-        } else if (event.type === 'payment_intent.payment_failed') {
-          console.log('Adding failed payment to retry queue');
-          paymentProcessingQueue.push({
-            type: 'failedPayment',
-            data: event.data.object,
-            retries: 0,
-          });
+        // Check if it's a MongoDB connection error
+        if (
+          error.name === 'MongooseServerSelectionError' ||
+          error.message.includes('Could not connect')
+        ) {
+          console.log(
+            'MongoDB connection error detected during webhook processing'
+          );
+
+          // For specific event types that require database operations, queue them
+          if (event.type === 'checkout.session.completed') {
+            console.log(
+              'Adding completed checkout to retry queue due to MongoDB connection issue'
+            );
+            paymentProcessingQueue.push({
+              type: 'completedCheckout',
+              data: event.data.object,
+              retries: 0,
+            });
+          } else if (event.type === 'payment_intent.payment_failed') {
+            console.log(
+              'Adding failed payment to retry queue due to MongoDB connection issue'
+            );
+            paymentProcessingQueue.push({
+              type: 'failedPayment',
+              data: event.data.object,
+              retries: 0,
+            });
+          }
+
+          // Don't crash the server for MongoDB connection issues
+          console.log(
+            'Continuing webhook processing despite MongoDB connection error'
+          );
+        } else {
+          // For other errors, still add to retry queue for checkout events
+          if (event.type === 'checkout.session.completed') {
+            console.log('Adding completed checkout to retry queue');
+            paymentProcessingQueue.push({
+              type: 'completedCheckout',
+              data: event.data.object,
+              retries: 0,
+            });
+          } else if (event.type === 'payment_intent.payment_failed') {
+            console.log('Adding failed payment to retry queue');
+            paymentProcessingQueue.push({
+              type: 'failedPayment',
+              data: event.data.object,
+              retries: 0,
+            });
+          }
         }
+
+        // Even if processing fails, don't crash the server
+        console.log(
+          'Webhook processing will continue asynchronously through the retry queue'
+        );
       }
-    }, 0);
+    });
 
     return;
   } catch (error) {
     console.error('Webhook processing error:', error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Webhook processing failed',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+
+    // This should only happen for errors outside the event processing
+    // We still want to respond to Stripe
+    if (!res.headersSent) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Webhook processing failed',
+        error:
+          process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  }
+};
+
+// Handle events that don't require database access
+const handleNonDatabaseEvent = event => {
+  try {
+    const eventData = event.data.object;
+
+    switch (event.type) {
+      case 'payment_intent.created':
+        console.log(
+          'Payment intent created:',
+          eventData.id,
+          'Amount:',
+          eventData.amount / 100,
+          'Currency:',
+          eventData.currency,
+          'Metadata:',
+          JSON.stringify(eventData.metadata || {})
+        );
+        break;
+      case 'payment_intent.succeeded':
+        console.log(
+          'Payment intent succeeded:',
+          eventData.id,
+          'Amount:',
+          eventData.amount / 100,
+          'Currency:',
+          eventData.currency,
+          'Status:',
+          eventData.status
+        );
+        break;
+      case 'charge.succeeded':
+        console.log(
+          'Charge succeeded:',
+          eventData.id,
+          'Amount:',
+          eventData.amount / 100,
+          'Currency:',
+          eventData.currency,
+          'Status:',
+          eventData.status
+        );
+        break;
+      case 'checkout.session.async_payment_succeeded':
+        console.log(
+          'Async payment succeeded for session:',
+          eventData.id,
+          'Payment intent:',
+          eventData.payment_intent
+        );
+        break;
+      case 'checkout.session.async_payment_failed':
+        console.log(
+          'Async payment failed for session:',
+          eventData.id,
+          'Payment intent:',
+          eventData.payment_intent
+        );
+        break;
+      default:
+        console.log(
+          `Received non-database event type ${event.type} - ID: ${
+            event.id || 'unknown'
+          }`
+        );
+    }
+  } catch (error) {
+    // Never crash the server for non-critical event handling
+    console.error('Error handling non-database event:', error);
   }
 };
 
@@ -344,72 +511,120 @@ const handleCompletedCheckout = async (session, isRetry = false) => {
 
     // Use either metadata.orderId or client_reference_id
     const orderId = session.metadata?.orderId || indianVisaBookingId;
-    const domainUrl =
-      session.metadata?.domainUrl || process.env.DEFAULT_DOMAIN_URL;
+    const domainUrl = session.metadata?.domainUrl;
     const price = session.amount_total / 100;
 
     console.log(`Using orderId: ${orderId}, domainUrl: ${domainUrl}`);
 
-    // Check if payment has already been processed to prevent duplicates
-    const existingRecord = await VisaRequestForm.findById(indianVisaBookingId);
-    console.log('Found existing record:', existingRecord ? 'Yes' : 'No');
-
-    if (
-      existingRecord &&
-      existingRecord.paid &&
-      existingRecord.paymentId === session.id
-    ) {
-      console.log(`Payment ${session.id} already processed. Skipping.`);
-      return;
-    }
-
-    // Find and update the visa request
-    console.log(`Updating visa request with ID: ${indianVisaBookingId}`);
-    const user = await VisaRequestForm.findByIdAndUpdate(
-      indianVisaBookingId,
-      {
-        visaStatus: 'pending',
-        price,
-        paid: true,
-        paymentMethod: 'stripe',
-        paymentId: session.id,
-        paymentStatus: session.payment_status,
-        paymentAmount: session.amount_total / 100,
-        paymentDate: new Date(),
-      },
-      { new: true }
-    );
-
-    if (!user) {
-      const error = new Error(
-        `No visa application found with ID: ${indianVisaBookingId}`
+    try {
+      // Check if payment has already been processed to prevent duplicates
+      const existingRecord = await VisaRequestForm.findById(
+        indianVisaBookingId
       );
+      console.log('Found existing record:', existingRecord ? 'Yes' : 'No');
 
-      if (!isRetry) {
-        // Add to retry queue if this is the first attempt
-        console.log(`Adding to retry queue: ${indianVisaBookingId}`);
-        paymentProcessingQueue.push({
-          type: 'completedCheckout',
-          data: session,
-          retries: 0,
-        });
+      if (
+        existingRecord &&
+        existingRecord.paid &&
+        existingRecord.paymentId === session.id
+      ) {
+        console.log(`Payment ${session.id} already processed. Skipping.`);
+        return;
       }
 
-      throw error;
+      // Find and update the visa request
+      console.log(`Updating visa request with ID: ${indianVisaBookingId}`);
+      const user = await VisaRequestForm.findByIdAndUpdate(
+        indianVisaBookingId,
+        {
+          visaStatus: 'pending',
+          price,
+          paid: true,
+          paymentMethod: 'stripe',
+          paymentId: session.id,
+          paymentStatus: session.payment_status,
+          paymentAmount: session.amount_total / 100,
+          paymentDate: new Date(),
+        },
+        { new: true }
+      );
+
+      if (!user) {
+        const error = new Error(
+          `No visa application found with ID: ${indianVisaBookingId}`
+        );
+
+        if (!isRetry) {
+          // Add to retry queue if this is the first attempt
+          console.log(`Adding to retry queue: ${indianVisaBookingId}`);
+          paymentProcessingQueue.push({
+            type: 'completedCheckout',
+            data: session,
+            retries: 0,
+          });
+        }
+
+        throw error;
+      }
+
+      // Send confirmation email
+      console.log(`Sending confirmation email to: ${user.emailId}`);
+      await sendIndiaVisaPaymentConfirmationEmail(
+        user.emailId,
+        orderId,
+        domainUrl
+      );
+
+      // Log successful processing
+      console.log(
+        `Successfully processed payment for application ID: ${indianVisaBookingId}`
+      );
+    } catch (dbError) {
+      // Special handling for MongoDB connection errors
+      console.error('Database operation failed:', dbError);
+
+      // Check if it's a MongoDB connection error
+      if (
+        dbError.name === 'MongooseServerSelectionError' ||
+        dbError.message.includes('Could not connect')
+      ) {
+        console.log('MongoDB connection error detected - queueing for retry');
+
+        // Always queue for retry on connection errors
+        if (!isRetry || isRetry) {
+          paymentProcessingQueue.push({
+            type: 'completedCheckout',
+            data: session,
+            retries: isRetry ? 3 : 0, // Set higher retry count to trigger admin alert sooner
+          });
+        }
+
+        // Send special alert for Webhook+DB connection issues
+        try {
+          const alertDomainUrl = session.metadata?.domainUrl;
+          await sendAdminAlert(
+            'URGENT: Webhook DB Connection Issue',
+            {
+              sessionId: session.id,
+              clientReferenceId: session.client_reference_id,
+              orderId: orderId,
+              error: `MongoDB connection failed: ${dbError.message}`,
+              action:
+                'Payment was received but database update failed. Manual verification needed.',
+            },
+            alertDomainUrl
+          );
+        } catch (emailError) {
+          console.error('Failed to send admin alert email:', emailError);
+        }
+
+        // Don't throw - allow function to complete
+        return false;
+      }
+
+      // Re-throw other DB errors
+      throw dbError;
     }
-
-    // Send confirmation email
-    console.log(`Sending confirmation email to: ${user.emailId}`);
-    await sendIndiaVisaPaymentConfirmationEmail(
-      user.emailId,
-      orderId,
-      domainUrl
-    );
-
-    // Log successful processing
-    console.log(
-      `Successfully processed payment for application ID: ${indianVisaBookingId}`
-    );
 
     return true;
   } catch (error) {
@@ -426,8 +641,7 @@ const handleCompletedCheckout = async (session, isRetry = false) => {
     } else {
       // Send alert on repeated failures
       try {
-        const alertDomainUrl =
-          session.metadata?.domainUrl || process.env.DEFAULT_DOMAIN_URL;
+        const alertDomainUrl = session.metadata?.domainUrl;
         console.log(`Sending alert email to admin via ${alertDomainUrl}`);
 
         await sendAdminAlert(
@@ -506,20 +720,16 @@ const handleFailedPayment = async (paymentIntent, isRetry = false) => {
     } else {
       // Send alert on critical failure
       try {
-        await sendAdminAlert(
-          'Failed Payment Processing Error',
-          {
-            paymentIntentId: paymentIntent.id,
-            orderId: paymentIntent.metadata?.orderId,
-            error: error.message,
-            paymentData: {
-              id: paymentIntent.id,
-              status: paymentIntent.status,
-              error: paymentIntent.last_payment_error,
-            },
+        await sendAdminAlert('Failed Payment Processing Error', {
+          paymentIntentId: paymentIntent.id,
+          orderId: paymentIntent.metadata?.orderId,
+          error: error.message,
+          paymentData: {
+            id: paymentIntent.id,
+            status: paymentIntent.status,
+            error: paymentIntent.last_payment_error,
           },
-          process.env.DEFAULT_DOMAIN_URL
-        );
+        });
       } catch (emailError) {
         console.error('Failed to send admin alert email:', emailError);
       }
