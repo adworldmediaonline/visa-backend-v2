@@ -7,7 +7,7 @@ import {
 import Stripe from 'stripe';
 
 const indiaVisaPaymentRouter = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_TEST);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE);
 
 // Create Checkout Session
 indiaVisaPaymentRouter.post(
