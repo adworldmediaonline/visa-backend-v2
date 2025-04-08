@@ -129,6 +129,10 @@ const visaRequestFormSchema = new mongoose.Schema(
       default: 'pending',
     },
 
+    paymentFailureReason: {
+      type: String,
+    },
+
     paymentMethod: {
       type: String,
       enum: ['stripe', 'razorpay'],
