@@ -1,7 +1,7 @@
 import paypal from '@paypal/checkout-server-sdk';
 import nodemailer from 'nodemailer';
 import VisaRequestForm from '../models/visa.js';
-const YOUR_DOMAIN = 'https://visacollect.com';
+import { sendIndiaApplicationConfirmation } from '../mailConfig/mail.config.js';
 
 const visaRequestFormController = {
   loginEvisaUser: async (req, res) => {
@@ -22,7 +22,9 @@ const visaRequestFormController = {
   },
   createVisaRequestForm: async (req, res) => {
     try {
-      const { HOSTINGER_EMAIL, HOSTINGER_PASSWORD } = req.mailAuth;
+      const { HOSTINGER_EMAIL } = req.mailAuth;
+
+      const domain = req.domainUrl;
 
       const visaRequestForms = new VisaRequestForm({
         ...req.body,
@@ -32,39 +34,21 @@ const visaRequestFormController = {
 
       let data = await visaRequestForms.save();
 
-      // NODEMAILER
-
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: false,
-        auth: {
-          user: HOSTINGER_EMAIL,
-          pass: HOSTINGER_PASSWORD,
-        },
-        tls: { ciphers: 'TLSv1.2' },
-        requireTLS: true,
-        debug: true,
-        connectionTimeout: 10000,
-      });
-
-      const mailOptions = {
-        from: HOSTINGER_EMAIL,
-        to: data.emailId,
-        subject: 'temporary ID.',
-        text: `Dear Sir/Madam,\n\nYour partially filled data has been saved successfully. Please note down the Temporary Application ID: ${data._id}`,
-      };
-
       try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.response);
-        return res.status(200).json(data);
-      } catch (error) {
-        console.error('Error sending email:', error);
-        return res.status(400).json({ message: 'error' });
+        await sendIndiaApplicationConfirmation({
+          applicationId: data._id,
+          domain,
+          hostingerSupportEmail: HOSTINGER_EMAIL,
+        });
+        console.log('Application confirmation email sent successfully');
+      } catch (emailError) {
+        console.error(
+          'Error sending application confirmation email:',
+          emailError
+        );
+        // Continue with the response even if email fails
       }
-
-      // NODEMAILER CODE END HERE
+      return res.status(200).json(data);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ error: error });
