@@ -72,11 +72,11 @@ const KenyaPersonalInfoSchema = new Schema(
     },
     emergencyContactName: {
       type: String,
-      required: true
+      required: false
     },
     emergencyContactPhone: {
       type: String,
-      required: true
+      required: false
     },
   },
   { timestamps: true }
