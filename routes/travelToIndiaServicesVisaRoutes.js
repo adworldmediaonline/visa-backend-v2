@@ -15,9 +15,9 @@ import visaRequestFormController8 from '../controllers/visaStep8Controller.js';
 import { sendEmailBasedOnDomain } from '../utils/sendEmailBasedOnDomain.js';
 
 const mailMiddlewareBasedOnDomain = (req, res, next) => {
-  req.mailAuth = sendEmailBasedOnDomain(
-    process.env.TRAVEL_TO_INDIA_SERVICES_DOMAIN_URL
-  );
+  const domain = process.env.TRAVEL_TO_INDIA_SERVICES_DOMAIN_URL;
+  req.domainUrl = domain;
+  req.mailAuth = sendEmailBasedOnDomain(domain);
   next();
 };
 

@@ -23,9 +23,7 @@ const visaRequestFormController = {
   createVisaRequestForm: async (req, res) => {
     try {
       const { HOSTINGER_EMAIL } = req.mailAuth;
-
       const domain = req.domainUrl;
-
       const visaRequestForms = new VisaRequestForm({
         ...req.body,
         visaStatus: 'incomplete',
@@ -34,6 +32,37 @@ const visaRequestFormController = {
 
       let data = await visaRequestForms.save();
 
+      // const transporter = nodemailer.createTransport({
+      //   host: process.env.SMTP_HOST,
+      //   port: process.env.SMTP_PORT,
+      //   secure: false,
+      //   auth: {
+      //     user: HOSTINGER_EMAIL,
+      //     pass: HOSTINGER_PASSWORD,
+      //   },
+      //   tls: { ciphers: 'TLSv1.2' },
+      //   requireTLS: true,
+      //   debug: true,
+      //   connectionTimeout: 10000,
+      // });
+
+      // const mailOptions = {
+      //   from: HOSTINGER_EMAIL,
+      //   to: data.emailId,
+      //   subject: 'temporary ID.',
+      //   text: `Dear Sir/Madam,\n\nYour partially filled data has been saved successfully. Please note down the Temporary Application ID: ${data._id}`,
+      // };
+
+      // try {
+      //   const info = await transporter.sendMail(mailOptions);
+      //   console.log('Email sent:', info.response);
+      //   return res.status(200).json(data);
+      // } catch (error) {
+      //   console.error('Error sending email:', error);
+      //   return res.status(400).json({ message: 'error' });
+      // }
+
+      // // NODEMAILER CODE END HERE
       try {
         await sendIndiaApplicationConfirmation({
           applicationId: data._id,
