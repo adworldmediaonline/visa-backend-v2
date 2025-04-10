@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFile } from 'fs/promises';
 import camelCase from 'lodash.camelcase';
-import EthiopiaVisaApplication from '../../models/ethiopia/ethiopiaVisaApplicationModel.js';
+import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel.js';
 import KenyaVisaDocuments from '../../models/kenya/kenyaVisaDocumentsModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,8 +62,6 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     const requiredDocuments = getRequiredDocuments(visaType);
     const normalizedDocType = documentType.toLowerCase().replace(/\s+/g, '');
 
-    // const normalizedDocType = camelcase(documentType);
-
     if (!requiredDocuments.includes(normalizedDocType)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
@@ -72,7 +70,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     }
 
     // Check if application exists
-    const application = await EthiopiaVisaApplication.findById(applicationId);
+    const application = await KenyaVisaApplication.findById(applicationId);
     if (!application) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -108,17 +106,16 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       documentRecord = await KenyaVisaDocuments.findOne({
         visaApplicationId: applicationId,
         applicantType: 'additional',
-        additionalApplicantIndex: additionalApplicantIndex,
+        additionalApplicantIndex: parseInt(additionalApplicantIndex),
       });
     }
 
     if (!documentRecord) {
       documentRecord = new KenyaVisaDocuments({
         visaApplicationId: applicationId,
-        visaType,
         applicantType,
         additionalApplicantIndex:
-          applicantType === 'additional' ? additionalApplicantIndex : null,
+          applicantType === 'additional' ? parseInt(additionalApplicantIndex) : null,
       });
     }
 
@@ -137,7 +134,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     const isComplete = requiredDocs.every(docType => {
       // Find a matching document in the current document record
       const docKey = Object.keys(documentRecord.documents).find(
-        key => key.toLowerCase().replace(/\s+/g, '') === docType
+        key => camelCase(key).toLowerCase().replace(/\s+/g, '') === docType
       );
       return (
         docKey &&
@@ -156,14 +153,20 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       applicantType === 'additional' &&
       additionalApplicantIndex !== null
     ) {
-      if (!application.additionalApplicants[additionalApplicantIndex]) {
+      const index = parseInt(additionalApplicantIndex);
+      if (!application.additionalApplicants[index]) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
           message: 'Additional applicant not found at the specified index',
         });
       }
-      application.additionalApplicants[additionalApplicantIndex].documents =
-        documentRecord._id;
+      application.additionalApplicants[index].documents = documentRecord._id;
+    }
+
+    // Update the lastExitUrl if all required documents are uploaded
+    if (isComplete && application.lastExitUrl === 'documents') {
+      application.lastExitUrl = 'gov-ref-details';
+      application.applicationStatus = 'incomplete';
     }
 
     await application.save();
@@ -173,8 +176,8 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       message: `${documentType} uploaded successfully`,
       data: {
         documentId: documentRecord._id,
-        normalizedDocumentTypeCamelCase,
-        fileInfo: documentRecord.documents[documentType],
+        documentType: normalizedDocumentTypeCamelCase,
+        fileInfo: documentRecord.documents[normalizedDocumentTypeCamelCase],
         isComplete: documentRecord.isComplete,
       },
     });
@@ -202,7 +205,7 @@ const getDocuments = expressAsyncHandler(async (req, res) => {
     };
 
     if (applicantType === 'additional' && additionalApplicantIndex !== null) {
-      query.additionalApplicantIndex = additionalApplicantIndex;
+      query.additionalApplicantIndex = parseInt(additionalApplicantIndex);
     }
 
     const documents = await KenyaVisaDocuments.findOne(query);
@@ -243,7 +246,7 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
     };
 
     if (applicantType === 'additional' && additionalApplicantIndex !== null) {
-      query.additionalApplicantIndex = additionalApplicantIndex;
+      query.additionalApplicantIndex = parseInt(additionalApplicantIndex);
     }
 
     const documentRecord = await KenyaVisaDocuments.findOne(query);
@@ -262,20 +265,29 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
     // Delete from cloudinary
     const publicId =
       documentRecord.documents[normalizedDocumentTypeCamelCase].public_id;
-    console.log(publicId);
     await cloudinary.uploader.destroy(publicId);
 
     // Remove document from record
     documentRecord.documents[normalizedDocumentTypeCamelCase] = undefined;
 
     // Update isComplete status
-    const visaType = documentRecord.visaType;
+    const application = await KenyaVisaApplication.findById(applicationId);
+    if (!application) {
+      return res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: 'Visa application not found',
+      });
+    }
+
+    // Get visa type from the application's visa details
+    const visaDetailsId = application.visaDetails;
+    const visaDetails = await mongoose.model('KenyaVisaDetails').findById(visaDetailsId);
+    const visaType = visaDetails ? visaDetails.visaType : '';
+
     const requiredDocs = getRequiredDocuments(visaType);
     const isComplete = requiredDocs.every(docType => {
-      // Find a matching document in the current document record
-      console.log(documentRecord.documents);
       const docKey = Object.keys(documentRecord.documents).find(
-        key => camelCase(key) === docType
+        key => camelCase(key).toLowerCase().replace(/\s+/g, '') === docType
       );
       return (
         docKey &&
@@ -286,6 +298,9 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
 
     documentRecord.isComplete = isComplete;
     await documentRecord.save();
+
+    application.lastExitUrl = 'documents';
+    await application.save();
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -303,4 +318,36 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
   }
 });
 
-export { uploadDocument, getDocuments, deleteDocument };
+// Get required documents for a visa type
+const getRequiredDocumentsForVisaType = expressAsyncHandler(async (req, res) => {
+  try {
+    const { visaType } = req.params;
+
+    if (!visaType) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'Visa type is required',
+      });
+    }
+
+    const requiredDocuments = getRequiredDocuments(visaType);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      data: requiredDocuments,
+    });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: 'Error retrieving required documents',
+      error: error.message,
+    });
+  }
+});
+
+export {
+  uploadDocument,
+  getDocuments,
+  deleteDocument,
+  getRequiredDocumentsForVisaType
+};

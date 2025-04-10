@@ -226,7 +226,7 @@ const emailConfig = {
     defaults: {
         company_name: 'Kenya Travel Application',
         logo_url:
-            'https://media.istockphoto.com/id/1400103307/vector/flag-of-ethiopia.jpg?s=2048x2048&w=is&k=20&c=lf9slNEFBG_tCtM5w4ZXpM1wcrexWJmBwD-bK2gT2Lc=',
+            'https://etakenya.go.ke/images/m.eta_logo.png',
         support_email: 'support@ethiopiatravelapplication.com',
         support_phone: '+18883693111',
         support_phone_display: 'United States +1 888 369 3111',
@@ -309,8 +309,8 @@ async function prepareKenyaVisaEmail(
             firstname: personalInfo.givenName || 'Applicant',
             lastname: personalInfo.surname || '',
             appid: applicationId,
-            Countryname: 'Kenya',
-            countryname: 'ethiopia',
+            Countryname: '',
+            countryname: 'kenya',
             visa_name: visaType,
             statusUrl,
             documentUrl,

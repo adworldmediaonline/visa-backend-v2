@@ -8,21 +8,24 @@ const kenyaDeclarationController = {
         try {
             const {
                 formId,
-                declarationAccepted,
-                termsAndConditionsAccepted,
-                privacyPolicyAccepted,
-                fullName,
-                date
+                tripFinanced,
+                convictedOfOffence,
+                deniedEntryToKenya,
+                previousTravelToKenya,
+                monetaryInstrument,
+                monetaryInstrumentName,
+                monetaryInstrumentCurrency,
+                amount
             } = req.body;
 
             // Validate required fields
             if (
                 !formId ||
-                !declarationAccepted ||
-                !termsAndConditionsAccepted ||
-                !privacyPolicyAccepted ||
-                !fullName ||
-                !date
+                tripFinanced === undefined ||
+                convictedOfOffence === undefined ||
+                deniedEntryToKenya === undefined ||
+                previousTravelToKenya === undefined ||
+                monetaryInstrument === undefined
             ) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     success: false,
@@ -34,11 +37,14 @@ const kenyaDeclarationController = {
             // Create the declaration
             const kenyaDeclaration = new KenyaDeclaration({
                 formId,
-                declarationAccepted,
-                termsAndConditionsAccepted,
-                privacyPolicyAccepted,
-                fullName,
-                date
+                tripFinanced,
+                convictedOfOffence,
+                deniedEntryToKenya,
+                previousTravelToKenya,
+                monetaryInstrument,
+                monetaryInstrumentName,
+                monetaryInstrumentCurrency,
+                amount
             });
 
             const kenyaDeclarationResult = await kenyaDeclaration.save();
@@ -50,7 +56,7 @@ const kenyaDeclarationController = {
                     {
                         declaration: kenyaDeclarationResult._id,
                         lastExitUrl: 'payment',
-                        applicationStatus: 'pending payment'
+                        applicationStatus: 'pending'
                     },
                     { new: true }
                 );
