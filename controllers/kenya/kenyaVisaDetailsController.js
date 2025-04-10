@@ -3,7 +3,7 @@ import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel.j
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { sendKenyaApplicationConfirmation } from '../../utils/mailConfigs.js';
+import { sendKenyaApplicationConfirmation } from '../../utils/kenyaEailConfigs.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

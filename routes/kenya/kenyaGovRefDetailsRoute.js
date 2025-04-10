@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrUpdateGovRefDetails, deleteGovRefDetails, getGovRefDetails } from '../../controllers/kenya/kenyaGovRefDetailsController';
+import { createOrUpdateGovRefDetails, deleteGovRefDetails, getGovRefDetails } from '../../controllers/kenya/kenyaGovRefDetailsController.js';
 
 const kenyaGovRefDetailsRouter = express.Router();
 

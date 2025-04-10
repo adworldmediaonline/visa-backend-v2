@@ -44,6 +44,11 @@ import ethiopiaGovRefDetailsRouter from './routes/ethiopia/ethiopiaGovRefDetails
 import indiaVisaRouter from './routes/indiaVisa/indiaVisaApplicationRoute.js';
 import { webhookCheckout } from './controllers/indiaVisa/paymentIndiaVisaController.js';
 import indiaVisaPaymentRouter from './routes/indiaVisa/paymentIndiaVisaRoute.js';
+import kenyaVisaApplicationRouter from './routes/kenya/kenyaVisaApplicationRoute.js';
+import kenyaDocumentsRoute from './routes/kenya/kenyaDocumentsRoute.js';
+import kenyaPaymentRouter from './routes/kenya/kenyaPaymentRoutes.js';
+import kenyaGovRefDetailsRouter from './routes/kenya/kenyaGovRefDetailsRoute.js';
+import kenyaEmailRouter from './routes/kenya/kenyaEmailRoutes.js';
 
 dotenv.config();
 dbConnect();
@@ -182,6 +187,13 @@ app.use('/api/v1/ethiopia-visa/documents', ethiopiaDocumentsRoute);
 app.use('/api/v1/mail', mailRouter);
 app.use('/api/v1/ethiopia-visa/payments', ethiopiaPaymentRouter);
 app.use('/api/v1/ethiopia-visa/gov-ref', ethiopiaGovRefDetailsRouter);
+
+// Kenya Visa Routes
+app.use('/api/v1/kenya-visa', kenyaVisaApplicationRouter);
+app.use('/api/v1/kenya-visa/documents', kenyaDocumentsRoute);
+app.use('/api/v1/kenya-visa/payments', kenyaPaymentRouter);
+app.use('/api/v1/kenya-visa/gov-ref', kenyaGovRefDetailsRouter);
+app.use('/api/v1/kenya-visa/mail', kenyaEmailRouter);
 
 // 404 handler
 app.use((req, res) => {

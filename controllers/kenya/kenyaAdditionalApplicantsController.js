@@ -15,6 +15,7 @@ const kenyaAdditionalApplicantsController = {
         surname,
         citizenship,
         gender,
+        maritalStatus,
         countryOfBirth,
         dateOfBirth,
         placeOfBirth,
@@ -24,6 +25,8 @@ const kenyaAdditionalApplicantsController = {
         streetAddress,
         addressCity,
         addressCountry,
+        emergencyContactName,
+        emergencyContactPhone,
 
         // Passport Info fields
         passportType,
@@ -48,11 +51,9 @@ const kenyaAdditionalApplicantsController = {
       if (
         !givenName ||
         !surname ||
-        !citizenship ||
         !gender ||
+        !maritalStatus ||
         !countryOfBirth ||
-        !dateOfBirth ||
-        !placeOfBirth ||
         !email ||
         !phoneNumber ||
         !occupation ||
@@ -71,9 +72,7 @@ const kenyaAdditionalApplicantsController = {
       if (
         !passportNumber ||
         !passportIssueDate ||
-        !passportExpiryDate ||
-        !passportIssuingCountry ||
-        !passportIssuingAuthority
+        !passportExpiryDate
       ) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,
@@ -89,6 +88,7 @@ const kenyaAdditionalApplicantsController = {
         surname,
         citizenship,
         gender,
+        maritalStatus,
         countryOfBirth,
         dateOfBirth,
         placeOfBirth,
@@ -98,7 +98,8 @@ const kenyaAdditionalApplicantsController = {
         streetAddress,
         addressCity,
         addressCountry,
-        isAdditionalApplicant: true,
+        emergencyContactName,
+        emergencyContactPhone
       });
 
       // Create passport info for additional applicant
@@ -109,8 +110,7 @@ const kenyaAdditionalApplicantsController = {
         passportIssueDate,
         passportExpiryDate,
         passportIssuingCountry,
-        passportIssuingAuthority,
-        isAdditionalApplicant: true,
+        passportIssuingAuthority
       });
 
       // Save both documents
@@ -170,6 +170,7 @@ const kenyaAdditionalApplicantsController = {
         surname,
         citizenship,
         gender,
+        maritalStatus,
         countryOfBirth,
         dateOfBirth,
         placeOfBirth,
@@ -179,8 +180,11 @@ const kenyaAdditionalApplicantsController = {
         streetAddress,
         addressCity,
         addressCountry,
+        emergencyContactName,
+        emergencyContactPhone,
 
         // Passport Info fields
+        passportType,
         passportNumber,
         passportIssueDate,
         passportExpiryDate,
@@ -220,6 +224,7 @@ const kenyaAdditionalApplicantsController = {
             'surname',
             'citizenship',
             'gender',
+            'maritalStatus',
             'countryOfBirth',
             'dateOfBirth',
             'placeOfBirth',
@@ -229,6 +234,8 @@ const kenyaAdditionalApplicantsController = {
             'streetAddress',
             'addressCity',
             'addressCountry',
+            'emergencyContactName',
+            'emergencyContactPhone',
           ].includes(key)
         )
       ) {
@@ -237,6 +244,7 @@ const kenyaAdditionalApplicantsController = {
         if (surname) personalInfoUpdate.surname = surname;
         if (citizenship) personalInfoUpdate.citizenship = citizenship;
         if (gender) personalInfoUpdate.gender = gender;
+        if (maritalStatus) personalInfoUpdate.maritalStatus = maritalStatus;
         if (countryOfBirth) personalInfoUpdate.countryOfBirth = countryOfBirth;
         if (dateOfBirth) personalInfoUpdate.dateOfBirth = dateOfBirth;
         if (placeOfBirth) personalInfoUpdate.placeOfBirth = placeOfBirth;
@@ -246,6 +254,8 @@ const kenyaAdditionalApplicantsController = {
         if (streetAddress) personalInfoUpdate.streetAddress = streetAddress;
         if (addressCity) personalInfoUpdate.addressCity = addressCity;
         if (addressCountry) personalInfoUpdate.addressCountry = addressCountry;
+        if (emergencyContactName) personalInfoUpdate.emergencyContactName = emergencyContactName;
+        if (emergencyContactPhone) personalInfoUpdate.emergencyContactPhone = emergencyContactPhone;
 
         await KenyaPersonalInfo.findByIdAndUpdate(
           applicant.personalInfo,
@@ -258,6 +268,7 @@ const kenyaAdditionalApplicantsController = {
       if (
         Object.keys(req.body).some(key =>
           [
+            'passportType',
             'passportNumber',
             'passportIssueDate',
             'passportExpiryDate',
@@ -267,6 +278,7 @@ const kenyaAdditionalApplicantsController = {
         )
       ) {
         const passportInfoUpdate = {};
+        if (passportType) passportInfoUpdate.passportType = passportType;
         if (passportNumber) passportInfoUpdate.passportNumber = passportNumber;
         if (passportIssueDate)
           passportInfoUpdate.passportIssueDate = passportIssueDate;
@@ -275,8 +287,7 @@ const kenyaAdditionalApplicantsController = {
         if (passportIssuingCountry)
           passportInfoUpdate.passportIssuingCountry = passportIssuingCountry;
         if (passportIssuingAuthority)
-          passportInfoUpdate.passportIssuingAuthority =
-            passportIssuingAuthority;
+          passportInfoUpdate.passportIssuingAuthority = passportIssuingAuthority;
 
         await KenyaPassportInfo.findByIdAndUpdate(
           applicant.passportInfo,

@@ -1,10 +1,10 @@
 {
   "visaTypes": [
     {
-      "name": "Journalist Visa",
+      "name": "Kenya eTA",
       "validities": [
         {
-          "type": "Single Entry 30 Days",
+          "type": "Single Entry 90 Days",
           "price": 214
         }
       ],
@@ -14,235 +14,78 @@
         "Application Letter",
         "Support Letter",
         "Inviting Company Info"
-      ]
-    },
-    {
-      "name": "Workshop/Conference Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 114
-        }
       ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Application Letter",
-        "Invitation Letter"
-      ]
-    },
-    {
-      "name": "Tourist Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 124
-        }
+      "reason": [
+        "Seaman (Fishing Vessel)",
+        "Work",
+        "Business",
+        "Conference / Meetings / Seminars / Training",
+        "Crew (planes or ships)",
+        "Crew (Positioning)",
+        "Tourism",
+        "Friends & Family",
+        "Medical Care",
+        "Religious Visit",
+        "Study / Education",
+        "Transit"
       ],
-      "attachments": ["Passport", "Photo"]
-    },
-    {
-      "name": "Investment Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 124
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 214
-        },
-        {
-          "type": "Multiple Entry 6 Months",
-          "price": 314
-        },
-        {
-          "type": "Multiple Entry 1 Year",
-          "price": 564
-        }
-      ],
-      "attachments": ["Passport", "Photo", "Support Letter"]
-    },
-    {
-      "name": "Government Work Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 164
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 214
-        },
-        {
-          "type": "Multiple Entry 6 Months",
-          "price": 464
-        }
-      ],
-      "attachments": ["Passport", "Photo", "Application Letter"]
-    },
-    {
-      "name": "NGO Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 264
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 664
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Application Letter",
-        "Registration License"
-      ]
-    },
-    {
-      "name": "Private Work Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 464
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 1064
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Business License",
-        "Application Letter",
-        "TIN Certificate"
-      ]
-    },
-    {
-      "name": "Foreign Investor Employee Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 164
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 364
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Copy of foreign Investor employee Visa"
-      ]
-    },
-    {
-      "name": "Student Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 124
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Letter of acceptance from an institution where study will take place"
-      ]
-    },
-    {
-      "name": "Religion Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 214
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 364
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Support Letter from Religious Institution"
-      ]
-    },
-    {
-      "name": "Residence Visa",
-      "validities": [
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 264
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Copy of foreign Investor employee Visa"
-      ]
-    },
-    {
-      "name": "Sports Competition and Training Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 144
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 264
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Copy of foreign Investor employee Visa"
-      ]
-    },
-    {
-      "name": "Medical Treatment Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 164
-        },
-        {
-          "type": "Multiple Entry 90 Days",
-          "price": 264
-        },
-        {
-          "type": "Multiple Entry 6 Months",
-          "price": 414
-        },
-        {
-          "type": "Multiple Entry 1 Year",
-          "price": 564
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Invitation letter from the Health Organization",
-        "Application letter to the health organization"
-      ]
-    },
-    {
-      "name": "Business and Related Studies Visa",
-      "validities": [
-        {
-          "type": "Single Entry 30 Days",
-          "price": 214
-        }
-      ],
-      "attachments": [
-        "Passport",
-        "Photo",
-        "Application Letter",
-        "Bank Statement",
-        "Company Profile"
+      "occupation": [
+        "Accommodation, Hospitality and Catering Professional",
+        "Accountant, Economist, Finance Professional",
+        "Actor",
+        "Advertising and Marketing Professional",
+        "Agricultural, Agronomy, Fisheries and Forestry Professional",
+        "Air or Maritime Transport Professional",
+        "Archaeologist",
+        "Architects and Landscape Professional",
+        "Author",
+        "Chief Executive and Managing Director",
+        "Conference and Event Professional",
+        "Cyber Security Developer",
+        "Dancer or Choreographer",
+        "Driver",
+        "Electrician",
+        "Engineer",
+        "Fire Fighter",
+        "Florist",
+        "Employee (government entities)",
+        "Graphic and Web Designer, Illustrator",
+        "Hairdresser",
+        "Historian",
+        "Housekeeper",
+        "Human Resource Manager",
+        "ICT Professional",
+        "Importers, Exporters and Wholesaler",
+        "Jeweller",
+        "Journalist, Blogger",
+        "Judicial and other Legal Professional",
+        "Librarian",
+        "Lobbyist",
+        "Manufacturer",
+        "Medical Practitioner",
+        "Meteorologist",
+        "Military",
+        "Minister of Religion",
+        "Multimedia Specialist and Web Developer",
+        "Music Professional",
+        "Not working by choice",
+        "Photographer",
+        "Plumber",
+        "Police Officer",
+        "Project Manager",
+        "Public Relations Professional",
+        "Research and Development",
+        "Retired",
+        "Sales Professional",
+        "School Teacher, University Lecturer and Tutor",
+        "Self-employed",
+        "Social Worker",
+        "Software and Applications Programmer",
+        "Sports Coach, Instructor",
+        "Student",
+        "Supply, Distribution and Procurement Professional",
+        "Translator",
+        "Veterinarian"
       ]
     }
   ]

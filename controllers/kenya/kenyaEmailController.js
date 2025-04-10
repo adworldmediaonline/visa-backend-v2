@@ -1,22 +1,22 @@
 import expressAsyncHandler from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
 import {
-    sendEthiopiaDocumentReminder,
-    sendEthiopiaPassportReminder,
-    sendEthiopiaPhotoReminder,
-    sendEthiopiaApplicationConfirmation,
-    sendEthiopiaSpecificDocumentReminder,
-    sendEthiopiaPaymentReminder
-} from '../../utils/mailConfigs.js';
+    sendKenyaDocumentReminder,
+    sendKenyaPassportReminder,
+    sendKenyaPhotoReminder,
+    sendKenyaApplicationConfirmation,
+    sendKenyaSpecificDocumentReminder,
+    sendKenyaPaymentReminder
+} from '../../utils/kenyaEailConfigs.js';
 
 /**
- * Send document reminder email for Ethiopia visa application
+ * Send document reminder email for Kenya visa application
  */
 const sendDocumentReminderEmail = expressAsyncHandler(async (req, res) => {
     try {
         const { applicationId } = req.params;
 
-        const result = await sendEthiopiaDocumentReminder(applicationId);
+        const result = await sendKenyaDocumentReminder(applicationId);
 
         res.status(StatusCodes.OK).json({
             success: true,
@@ -36,7 +36,7 @@ const sendPaymentRemaiderEmail = expressAsyncHandler(async (req, res) => {
     try {
         const { applicationId } = req.params;
 
-        const result = await sendEthiopiaPaymentReminder(applicationId);
+        const result = await sendKenyaPaymentReminder(applicationId);
 
         res.status(StatusCodes.OK).json({
             success: true,
@@ -54,13 +54,13 @@ const sendPaymentRemaiderEmail = expressAsyncHandler(async (req, res) => {
 
 
 /**
- * Send passport reminder email for Ethiopia visa application
+ * Send passport reminder email for Kenya visa application
  */
 const sendPassportReminderEmail = expressAsyncHandler(async (req, res) => {
     try {
         const { applicationId } = req.params;
 
-        const result = await sendEthiopiaPassportReminder(applicationId);
+        const result = await sendKenyaPassportReminder(applicationId);
 
         res.status(StatusCodes.OK).json({
             success: true,
@@ -77,13 +77,13 @@ const sendPassportReminderEmail = expressAsyncHandler(async (req, res) => {
 });
 
 /**
- * Send photo reminder email for Ethiopia visa application
+ * Send photo reminder email for Kenya visa application
  */
 const sendPhotoReminderEmail = expressAsyncHandler(async (req, res) => {
     try {
         const { applicationId } = req.params;
 
-        const result = await sendEthiopiaPhotoReminder(applicationId);
+        const result = await sendKenyaPhotoReminder(applicationId);
 
         res.status(StatusCodes.OK).json({
             success: true,
@@ -100,13 +100,13 @@ const sendPhotoReminderEmail = expressAsyncHandler(async (req, res) => {
 });
 
 /**
- * Send application confirmation email for Ethiopia visa application
+ * Send application confirmation email for Kenya visa application
  */
 const sendApplicationConfirmationEmail = expressAsyncHandler(async (req, res) => {
     try {
         const { applicationId } = req.params;
 
-        const result = await sendEthiopiaApplicationConfirmation(applicationId);
+        const result = await sendKenyaApplicationConfirmation(applicationId);
 
         res.status(StatusCodes.OK).json({
             success: true,
@@ -123,7 +123,7 @@ const sendApplicationConfirmationEmail = expressAsyncHandler(async (req, res) =>
 });
 
 /**
- * Send specific document reminder email for Ethiopia visa application
+ * Send specific document reminder email for Kenya visa application
  */
 const sendSpecificDocumentReminderEmail = expressAsyncHandler(async (req, res) => {
     try {
@@ -137,7 +137,7 @@ const sendSpecificDocumentReminderEmail = expressAsyncHandler(async (req, res) =
             });
         }
 
-        const result = await sendEthiopiaSpecificDocumentReminder(applicationId, requiredDocuments);
+        const result = await sendKenyaSpecificDocumentReminder(applicationId, requiredDocuments);
 
         res.status(StatusCodes.OK).json({
             success: true,

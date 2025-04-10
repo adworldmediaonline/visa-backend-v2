@@ -1,10 +1,10 @@
 import express from 'express';
-import kenyaVisaApplicationController from '../../controllers/kenya/kenyaVisaApplicationController';
-import kenyaVisaDetailsController from '../../controllers/kenya/kenyaVisaDetailsController';
-import kenyaArrivalInfoController from '../../controllers/kenya/kenyaArrivalInfoController';
-import kenyaPersonalInfoController from '../../controllers/kenya/kenyaPersonalInfoController';
-import kenyaPassportInfoController from '../../controllers/kenya/kenyaPassportInfoController';
-import kenyaAdditionalApplicantsController from '../../controllers/kenya/kenyaAdditionalApplicantsController';
+import kenyaVisaApplicationController from '../../controllers/kenya/kenyaVisaApplicationController.js';
+import kenyaVisaDetailsController from '../../controllers/kenya/kenyaVisaDetailsController.js';
+import kenyaArrivalInfoController from '../../controllers/kenya/kenyaArrivalInfoController.js';
+import kenyaPersonalInfoController from '../../controllers/kenya/kenyaPersonalInfoController.js';
+import kenyaPassportInfoController from '../../controllers/kenya/kenyaPassportInfoController.js';
+import kenyaAdditionalApplicantsController from '../../controllers/kenya/kenyaAdditionalApplicantsController.js';
 
 const kenyaVisaApplicationRouter = express.Router();
 

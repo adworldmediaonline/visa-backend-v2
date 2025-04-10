@@ -19,12 +19,9 @@ const kenyaPassportInfoController = {
       // Validate required fields
       if (
         !formId ||
-        !passportType ||
         !passportNumber ||
         !passportIssueDate ||
-        !passportExpiryDate ||
-        !passportIssuingCountry ||
-        !passportIssuingAuthority
+        !passportExpiryDate
       ) {
         return res.status(StatusCodes.BAD_REQUEST).json({
           success: false,

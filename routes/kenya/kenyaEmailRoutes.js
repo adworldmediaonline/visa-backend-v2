@@ -8,14 +8,14 @@ import {
     sendPaymentRemaiderEmail
 } from '../../controllers/kenya/kenyaEmailController.js';
 
-const mailRouter = express.Router();
+const kenyaEmailRouter = express.Router();
 
 // Email routes for Ethiopia visa applications
-mailRouter.post('/documents-reminder/:applicationId', sendDocumentReminderEmail);
-mailRouter.post('/payment-reminder/:applicationId', sendPaymentRemaiderEmail);
-mailRouter.post('/passport-reminder/:applicationId', sendPassportReminderEmail);
-mailRouter.post('/photo-reminder/:applicationId', sendPhotoReminderEmail);
-mailRouter.post('/application-confirmation/:applicationId', sendApplicationConfirmationEmail);
-mailRouter.post('/specific-documents-reminder/:applicationId', sendSpecificDocumentReminderEmail);
+kenyaEmailRouter.post('/documents-reminder/:applicationId', sendDocumentReminderEmail);
+kenyaEmailRouter.post('/payment-reminder/:applicationId', sendPaymentRemaiderEmail);
+kenyaEmailRouter.post('/passport-reminder/:applicationId', sendPassportReminderEmail);
+kenyaEmailRouter.post('/photo-reminder/:applicationId', sendPhotoReminderEmail);
+kenyaEmailRouter.post('/application-confirmation/:applicationId', sendApplicationConfirmationEmail);
+kenyaEmailRouter.post('/specific-documents-reminder/:applicationId', sendSpecificDocumentReminderEmail);
 
-export default mailRouter;
+export default kenyaEmailRouter;

@@ -1,5 +1,5 @@
 import express from 'express';
-import kenyaPaymentController from '../../controllers/kenya/kenyaPaymentController';
+import kenyaPaymentController from '../../controllers/kenya/kenyaPaymentController.js';
 
 const kenyaPaymentRouter = express.Router();
 

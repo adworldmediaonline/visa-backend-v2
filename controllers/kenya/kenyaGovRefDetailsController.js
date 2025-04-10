@@ -1,7 +1,7 @@
 import expressAsyncHandler from 'express-async-handler';
 import { StatusCodes } from 'http-status-codes';
-import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel';
-import KenyaGovRefDetails from '../../models/kenya/kenyaGovRefDetailsModel';
+import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel.js';
+import KenyaGovRefDetails from '../../models/kenya/kenyaGovRefDetailsModel.js';
 
 // Create or update government reference details
 const createOrUpdateGovRefDetails = expressAsyncHandler(async (req, res) => {

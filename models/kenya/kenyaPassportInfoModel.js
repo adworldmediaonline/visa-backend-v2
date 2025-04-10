@@ -10,7 +10,7 @@ const kenyaPassportInfoSchema = new Schema(
     },
     passportType: {
       type: String,
-      required: true
+      required: false
     },
     passportNumber: {
       type: String,
@@ -26,11 +26,11 @@ const kenyaPassportInfoSchema = new Schema(
     },
     passportIssuingCountry: {
       type: String,
-      required: true
+      required: false
     },
     passportIssuingAuthority: {
       type: String,
-      required: true
+      required: false
     },
   },
   { timestamps: true }
