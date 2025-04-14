@@ -6,127 +6,127 @@ import egyptPersonalInfoController from '../../controllers/egyptN/egyptPersonalI
 import egyptPassportInfoController from '../../controllers/egyptN/egyptPassportInfoController.js';
 import egyptAdditionalApplicantsController from '../../controllers/egyptN/egyptAdditionalApplicantsController.js';
 
-const egyptVisaApplicationRouter = express.Router();
+const egyptVisaApplicationRouterN = express.Router();
 
 // Main application routes
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/all',
   egyptVisaApplicationController.getAllEgyptVisaApplications
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/:id',
   egyptVisaApplicationController.getEgyptVisaApplicationById
 );
 
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/check-status',
   egyptVisaApplicationController.checkApplicationStatus
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/:id',
   egyptVisaApplicationController.updateEgyptVisaApplication
 );
 
-egyptVisaApplicationRouter.delete(
+egyptVisaApplicationRouterN.delete(
   '/:id',
   egyptVisaApplicationController.deleteEgyptVisaApplication
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/:id/applicants',
   egyptVisaApplicationController.getAllApplicantsDetails
 );
 
 // Visa details routes
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/visa-details',
   egyptVisaDetailsController.createEgyptVisaDetails
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/visa-details/:formId',
   egyptVisaDetailsController.getEgyptVisaDetailsByFormId
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/visa-details/:formId',
   egyptVisaDetailsController.updateEgyptVisaDetails
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/visa-types/prices',
   egyptVisaDetailsController.getVisaTypesAndPrices
 );
 
 // Arrival info routes
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/arrival-info',
   egyptArrivalInfoController.createEgyptArrivalInfo
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/arrival-info/:formId',
   egyptArrivalInfoController.getEgyptArrivalInfoByFormId
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/arrival-info/:formId',
   egyptArrivalInfoController.updateEgyptArrivalInfo
 );
 
 // Personal info routes
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/personal-info',
   egyptPersonalInfoController.createEgyptPersonalInfo
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/personal-info/:formId',
   egyptPersonalInfoController.getEgyptPersonalInfoByFormId
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/personal-info/:formId',
   egyptPersonalInfoController.updateEgyptPersonalInfo
 );
 
 // Passport info routes
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/passport-info',
   egyptPassportInfoController.createEgyptPassportInfo
 );
 
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/passport-info/:formId',
   egyptPassportInfoController.getEgyptPassportInfoByFormId
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/passport-info/:formId',
   egyptPassportInfoController.updateEgyptPassportInfo
 );
 
 // Additional Applicants
-egyptVisaApplicationRouter.get(
+egyptVisaApplicationRouterN.get(
   '/additional-applicants/:formId',
   egyptAdditionalApplicantsController.getAdditionalApplicants
 );
 
-egyptVisaApplicationRouter.post(
+egyptVisaApplicationRouterN.post(
   '/additional-applicants/:formId',
   egyptAdditionalApplicantsController.addAdditionalApplicant
 );
 
-egyptVisaApplicationRouter.put(
+egyptVisaApplicationRouterN.put(
   '/additional-applicants/:formId/:applicantIndex',
   egyptAdditionalApplicantsController.updateAdditionalApplicant
 );
 
-egyptVisaApplicationRouter.delete(
+egyptVisaApplicationRouterN.delete(
   '/additional-applicants/:formId/:applicantIndex',
   egyptAdditionalApplicantsController.removeAdditionalApplicant
 );
 
-export default egyptVisaApplicationRouter;
+export default egyptVisaApplicationRouterN;
