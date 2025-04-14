@@ -1,0 +1,21 @@
+{
+  "visaTypes": [
+    {
+      "name": "Egypt Tourist Visa",
+      "validities": [
+        {
+          "type": "Single Entry 90 Days",
+          "price": 214
+        },
+        {
+          "type": "Multiple Entry 180 Days",
+          "price": 300
+        }
+      ],
+      "attachments": [
+        "Passport",
+        "Photo"
+      ]
+    }
+  ]
+}

@@ -5,8 +5,9 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { readFile } from 'fs/promises';
 import camelCase from 'lodash.camelcase';
-import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel.js';
-import KenyaVisaDocuments from '../../models/kenya/kenyaVisaDocumentsModel.js';
+import mongoose from 'mongoose';
+import EgyptVisaApplicationN from '../../models/egyptN/egyptVisaApplicationModel.js';
+import EgyptVisaDocuments from '../../models/egyptN/egyptVisaDocumentsModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -70,7 +71,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     }
 
     // Check if application exists
-    const application = await KenyaVisaApplication.findById(applicationId);
+    const application = await EgyptVisaApplicationN.findById(applicationId);
     if (!application) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -87,7 +88,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
 
     // Upload document to cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: `kenya-visa/${visaType}/${applicationId}`,
+      folder: `egypt-visa/${visaType}/${applicationId}`,
       resource_type: 'auto',
     });
 
@@ -95,7 +96,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     let documentRecord;
 
     if (applicantType === 'primary') {
-      documentRecord = await KenyaVisaDocuments.findOne({
+      documentRecord = await EgyptVisaDocuments.findOne({
         visaApplicationId: applicationId,
         applicantType: 'primary',
       });
@@ -103,7 +104,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
       applicantType === 'additional' &&
       additionalApplicantIndex !== null
     ) {
-      documentRecord = await KenyaVisaDocuments.findOne({
+      documentRecord = await EgyptVisaDocuments.findOne({
         visaApplicationId: applicationId,
         applicantType: 'additional',
         additionalApplicantIndex: parseInt(additionalApplicantIndex),
@@ -111,7 +112,7 @@ const uploadDocument = expressAsyncHandler(async (req, res) => {
     }
 
     if (!documentRecord) {
-      documentRecord = new KenyaVisaDocuments({
+      documentRecord = new EgyptVisaDocuments({
         visaApplicationId: applicationId,
         applicantType,
         additionalApplicantIndex:
@@ -208,7 +209,7 @@ const getDocuments = expressAsyncHandler(async (req, res) => {
       query.additionalApplicantIndex = parseInt(additionalApplicantIndex);
     }
 
-    const documents = await KenyaVisaDocuments.findOne(query);
+    const documents = await EgyptVisaDocuments.findOne(query);
 
     if (!documents) {
       return res.status(StatusCodes.NOT_FOUND).json({
@@ -249,7 +250,7 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
       query.additionalApplicantIndex = parseInt(additionalApplicantIndex);
     }
 
-    const documentRecord = await KenyaVisaDocuments.findOne(query);
+    const documentRecord = await EgyptVisaDocuments.findOne(query);
     const normalizedDocumentTypeCamelCase = camelCase(documentType);
 
     if (
@@ -271,7 +272,7 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
     documentRecord.documents[normalizedDocumentTypeCamelCase] = undefined;
 
     // Update isComplete status
-    const application = await KenyaVisaApplication.findById(applicationId);
+    const application = await EgyptVisaApplicationN.findById(applicationId);
     if (!application) {
       return res.status(StatusCodes.NOT_FOUND).json({
         success: false,
@@ -281,7 +282,7 @@ const deleteDocument = expressAsyncHandler(async (req, res) => {
 
     // Get visa type from the application's visa details
     const visaDetailsId = application.visaDetails;
-    const visaDetails = await mongoose.model('KenyaVisaDetails').findById(visaDetailsId);
+    const visaDetails = await mongoose.model('EgyptVisaDetails').findById(visaDetailsId);
     const visaType = visaDetails ? visaDetails.visaType : '';
 
     const requiredDocs = getRequiredDocuments(visaType);

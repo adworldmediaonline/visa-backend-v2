@@ -1,31 +1,28 @@
-import KenyaDeclaration from '../../models/kenya/kenyaDeclarationModel.js';
-import KenyaVisaApplication from '../../models/kenya/kenyaVisaApplicationModel.js';
+import EgyptDeclaration from '../../models/egyptN/egyptDeclarationModel.js';
+import EgyptVisaApplicationN from '../../models/egyptN/egyptVisaApplicationModel.js';
 import { StatusCodes } from 'http-status-codes';
 import expressAsyncHandler from 'express-async-handler';
 
-const kenyaDeclarationController = {
-    createKenyaDeclaration: expressAsyncHandler(async (req, res) => {
+const egyptDeclarationController = {
+    createEgyptDeclaration: expressAsyncHandler(async (req, res) => {
         try {
             const {
                 formId,
-                tripFinanced,
-                convictedOfOffence,
-                deniedEntryToKenya,
-                previousTravelToKenya,
-                monetaryInstrument,
-                monetaryInstrumentName,
-                monetaryInstrumentCurrency,
-                amount
+                visitedBefore,
+                dateFrom,
+                dateTo,
+                whereStayed,
+                deportedFromEgyptOrOtherCountry,
+                deportedDateFrom,
+                deportedDateTo,
+                whoIsPaying
             } = req.body;
 
             // Validate required fields
             if (
                 !formId ||
-                tripFinanced === undefined ||
-                convictedOfOffence === undefined ||
-                deniedEntryToKenya === undefined ||
-                previousTravelToKenya === undefined ||
-                monetaryInstrument === undefined
+                visitedBefore === undefined ||
+                deportedFromEgyptOrOtherCountry === undefined
             ) {
                 return res.status(StatusCodes.BAD_REQUEST).json({
                     success: false,
@@ -35,118 +32,118 @@ const kenyaDeclarationController = {
             }
 
             // Create the declaration
-            const kenyaDeclaration = new KenyaDeclaration({
+            const egyptDeclaration = new EgyptDeclaration({
                 formId,
-                tripFinanced,
-                convictedOfOffence,
-                deniedEntryToKenya,
-                previousTravelToKenya,
-                monetaryInstrument,
-                monetaryInstrumentName,
-                monetaryInstrumentCurrency,
-                amount
+                visitedBefore,
+                dateFrom,
+                dateTo,
+                whereStayed,
+                deportedFromEgyptOrOtherCountry,
+                deportedDateFrom,
+                deportedDateTo,
+                whoIsPaying
             });
 
-            const kenyaDeclarationResult = await kenyaDeclaration.save();
+            const egyptDeclarationResult = await egyptDeclaration.save();
 
             // Update the main application to reference this declaration
-            const updatedKenyaVisaApplication =
-                await KenyaVisaApplication.findOneAndUpdate(
+            const updatedEgyptVisaApplication =
+                await EgyptVisaApplicationN.findOneAndUpdate(
                     { _id: formId },
                     {
-                        declaration: kenyaDeclarationResult._id,
+                        declaration: egyptDeclarationResult._id,
                         lastExitUrl: 'payment',
                         applicationStatus: 'pending'
                     },
                     { new: true }
                 );
 
-            if (!updatedKenyaVisaApplication) {
+            if (!updatedEgyptVisaApplication) {
                 // If the application doesn't exist, delete the declaration we just created
-                await KenyaDeclaration.findByIdAndDelete(
-                    kenyaDeclarationResult._id
+                await EgyptDeclaration.findByIdAndDelete(
+                    egyptDeclarationResult._id
                 );
                 return res.status(StatusCodes.NOT_FOUND).json({
                     success: false,
-                    message: 'Kenya visa application not found',
+                    message: 'Egypt visa application not found',
                     statusCode: StatusCodes.NOT_FOUND,
                 });
             }
 
             return res.status(StatusCodes.CREATED).json({
                 success: true,
-                data: kenyaDeclarationResult
+                data: egyptDeclarationResult
             });
         } catch (error) {
-            console.error('Error creating Kenya declaration:', error);
+            console.error('Error creating Egypt declaration:', error);
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
-                message: 'Error creating Kenya declaration',
+                message: 'Error creating Egypt declaration',
                 error: error.message
             });
         }
     }),
 
-    getKenyaDeclarationByFormId: expressAsyncHandler(async (req, res) => {
+    getEgyptDeclarationByFormId: expressAsyncHandler(async (req, res) => {
         try {
             const { formId } = req.params;
 
-            const kenyaDeclaration = await KenyaDeclaration.findOne({ formId });
+            const egyptDeclaration = await EgyptDeclaration.findOne({ formId });
 
-            if (!kenyaDeclaration) {
+            if (!egyptDeclaration) {
                 return res.status(StatusCodes.NOT_FOUND).json({
                     success: false,
-                    message: 'Kenya declaration not found',
+                    message: 'Egypt declaration not found',
                     statusCode: StatusCodes.NOT_FOUND,
                 });
             }
 
             return res.status(StatusCodes.OK).json({
                 success: true,
-                data: kenyaDeclaration
+                data: egyptDeclaration
             });
         } catch (error) {
-            console.error('Error fetching Kenya declaration:', error);
+            console.error('Error fetching Egypt declaration:', error);
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
-                message: 'Error fetching Kenya declaration',
+                message: 'Error fetching Egypt declaration',
                 error: error.message
             });
         }
     }),
 
-    updateKenyaDeclaration: expressAsyncHandler(async (req, res) => {
+    updateEgyptDeclaration: expressAsyncHandler(async (req, res) => {
         try {
             const { formId } = req.params;
             const updateData = req.body;
 
-            const kenyaDeclaration = await KenyaDeclaration.findOneAndUpdate(
+            const egyptDeclaration = await EgyptDeclaration.findOneAndUpdate(
                 { formId },
                 updateData,
                 { new: true }
             );
 
-            if (!kenyaDeclaration) {
+            if (!egyptDeclaration) {
                 return res.status(StatusCodes.NOT_FOUND).json({
                     success: false,
-                    message: 'Kenya declaration not found',
+                    message: 'Egypt declaration not found',
                     statusCode: StatusCodes.NOT_FOUND,
                 });
             }
 
             return res.status(StatusCodes.OK).json({
                 success: true,
-                data: kenyaDeclaration
+                data: egyptDeclaration
             });
         } catch (error) {
-            console.error('Error updating Kenya declaration:', error);
+            console.error('Error updating Egypt declaration:', error);
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
                 success: false,
-                message: 'Error updating Kenya declaration',
+                message: 'Error updating Egypt declaration',
                 error: error.message
             });
         }
     }),
 };
 
-export default kenyaDeclarationController;
+export default egyptDeclarationController;

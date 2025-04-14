@@ -49,6 +49,12 @@ import kenyaDocumentsRoute from './routes/kenya/kenyaDocumentsRoute.js';
 import kenyaPaymentRouter from './routes/kenya/kenyaPaymentRoutes.js';
 import kenyaGovRefDetailsRouter from './routes/kenya/kenyaGovRefDetailsRoute.js';
 import kenyaEmailRouter from './routes/kenya/kenyaEmailRoutes.js';
+import kenyaDeclarationRouter from './routes/kenya/kenyaDeclarationRoutes.js';
+import egyptDocumentsRoute from './routes/egyptN/egyptDocumentsRoute.js';
+import egyptPaymentRouter from './routes/egyptN/egyptPaymentRoutes.js';
+import egyptGovRefDetailsRouter from './routes/egyptN/egyptGovRefDetailsRoute.js';
+import egyptDeclarationRouter from './routes/egyptN/egyptDeclarationRoutes.js';
+import egyptEmailRouter from './routes/egyptN/egyptEmailRoutes.js';
 
 dotenv.config();
 dbConnect();
@@ -193,7 +199,16 @@ app.use('/api/v1/kenya-visa', kenyaVisaApplicationRouter);
 app.use('/api/v1/kenya-visa/documents', kenyaDocumentsRoute);
 app.use('/api/v1/kenya-visa/payments', kenyaPaymentRouter);
 app.use('/api/v1/kenya-visa/gov-ref', kenyaGovRefDetailsRouter);
+app.use('/api/v1/kenya-visa/declarations', kenyaDeclarationRouter);
 app.use('/api/v1/kenya-visa/mail', kenyaEmailRouter);
+
+// Egypt Visa Routes
+app.use('/api/v1/egypt-visa', egyptVisaApplicationRouter);
+app.use('/api/v1/egypt-visa/documents', egyptDocumentsRoute);
+app.use('/api/v1/egypt-visa/payments', egyptPaymentRouter);
+app.use('/api/v1/egypt-visa/gov-ref', egyptGovRefDetailsRouter);
+app.use('/api/v1/egypt-visa/declarations', egyptDeclarationRouter);
+app.use('/api/v1/egypt-visa/mail', egyptEmailRouter);
 
 // 404 handler
 app.use((req, res) => {
