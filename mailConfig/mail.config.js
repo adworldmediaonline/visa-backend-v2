@@ -110,6 +110,118 @@ const indiaVisaEmailConfig = {
         </div>
       </div>`,
     },
+
+    // New India-specific email templates
+    indiaPaymentReminder: {
+      subject: 'URGENT: Complete Your India Visa Payment #{$appid}',
+      template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
+        <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>
+          <div style='text-align: center; background-color: #f8f1e4; padding: 10px; margin:10px; border-radius: 8px;'>
+            <p style='color: #FF5722; margin-top: 12px; font-size:20px; font-weight: bold;'>Action Required: Complete Your Payment</p>
+          </div>
+        </div>
+        <div style='background-color: #ffffff; padding: 25px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <h4 style='color: #FF5722; margin-top: 0;'>Dear {$firstname} {$lastname},</h4>
+          <p style='margin-bottom: 15px;'>We noticed that your India Visa application (Reference #{$appid}) requires payment to proceed with processing.</p>
+          <div style='background-color: #fff6e9; padding: 12px; border-left: 4px solid #FF5722; margin: 15px 0;'>
+            <p style='margin: 5px 0; font-weight: bold;'>Application Status: Payment Required</p>
+            <p style='margin: 5px 0;'>Application Reference: {$appid}</p>
+          </div>
+          <p style='margin-bottom: 15px;'>Your application has been filled out successfully, but we cannot proceed with processing until payment is completed.</p>
+          <div style='margin: 20px 0;'>
+            <p style='margin-bottom: 10px;'><strong>Please use the link below to complete your payment immediately:</strong></p>
+            <a href='{$paymentUrl}' style='background-color:#FF5722; color: white; text-decoration: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Complete Payment Now</a>
+          </div>
+          <p style='color: #666;'>⏰ <strong>Note:</strong> Delays in payment may affect your visa processing timelines and travel plans.</p>
+          <p style='color: #666; font-style: italic;'>If you experience any issues with the payment process, please contact our support team immediately at <a href='mailto:{$support_email}' style='color: #FF5722; text-decoration: none;'>{$support_email}</a></p>
+          <p>Best regards,<br> India eVisa Team<br> <a href='{$website_url}' style='color: #FF5722; text-decoration: none;'>{$website_url}</a></p>
+        </div>
+        <div style='text-align: center; background-color: #FF5722; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 15px; color: #ffffff; font-size: 14px;'>
+          <strong>Need Assistance?</strong><br>
+          <strong>Email</strong>: <a href='mailto:{$support_email}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_email}</a><br>
+        </div>
+        <div style='margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 4px; text-align: center;'>
+          <p style='font-size: 14px;'>© ${new Date().getFullYear()} {$company_name}. All rights reserved.</p>
+        </div>
+      </div>`,
+    },
+
+    indiaDocumentReminder: {
+      subject:
+        'Action Required: Upload Missing Documents for India Visa #{$appid}',
+      template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
+        <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>
+          <div style='text-align: center; background-color: #e3f2fd; padding: 10px; margin:10px; border-radius: 8px;'>
+            <p style='color: #1976D2; margin-top: 12px; font-size:20px; font-weight: bold;'>Document Upload Required</p>
+          </div>
+        </div>
+        <div style='background-color: #ffffff; padding: 25px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <h4 style='color: #1976D2; margin-top: 0;'>Dear {$firstname} {$lastname},</h4>
+          <p style='margin-bottom: 15px;'>We're processing your India Visa application, but we need additional documents to proceed.</p>
+          <div style='background-color: #e3f2fd; padding: 12px; border-left: 4px solid #1976D2; margin: 15px 0;'>
+            <p style='margin: 5px 0; font-weight: bold;'>Application Status: Documents Required</p>
+            <p style='margin: 5px 0;'>Application Reference: {$appid}</p>
+          </div>
+          <p style='margin-bottom: 15px;'>To continue processing your visa application, please upload the following documents:</p>
+          <ul style='margin-bottom: 15px; padding-left: 20px;'>
+            <li>Passport scan (clear color copy of the bio page)</li>
+            <li>Recent passport-sized photograph (meeting visa photo requirements)</li>
+            <li>Any additional supporting documents specific to your visa type</li>
+          </ul>
+          <div style='margin: 20px 0;'>
+            <p style='margin-bottom: 10px;'><strong>Upload your documents now:</strong></p>
+            <a href='{$documentUrl}' style='background-color:#1976D2; color: white; text-decoration: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Upload Documents</a>
+          </div>
+          <p style='color: #666;'>⏰ <strong>Important:</strong> Delays in document submission will postpone your visa processing and could affect your travel plans.</p>
+          <p style='color: #666; font-style: italic;'>If you need assistance with document requirements, please contact our support team at <a href='mailto:{$support_email}' style='color: #1976D2; text-decoration: none;'>{$support_email}</a></p>
+          <p>Best regards,<br> India eVisa Team<br> <a href='{$website_url}' style='color: #1976D2; text-decoration: none;'>{$website_url}</a></p>
+        </div>
+        <div style='text-align: center; background-color: #1976D2; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 15px; color: #ffffff; font-size: 14px;'>
+          <strong>Need Assistance?</strong><br>
+          <strong>Email</strong>: <a href='mailto:{$support_email}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_email}</a><br>
+        </div>
+        <div style='margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 4px; text-align: center;'>
+          <p style='font-size: 14px;'>© ${new Date().getFullYear()} {$company_name}. All rights reserved.</p>
+        </div>
+      </div>`,
+    },
+
+    indiaIncompleteFormReminder: {
+      subject: 'Complete Your India Visa Application #{$appid}',
+      template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
+        <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>
+          <div style='text-align: center; background-color: #EFEBE9; padding: 10px; margin:10px; border-radius: 8px;'>
+            <p style='color: #5D4037; margin-top: 12px; font-size:20px; font-weight: bold;'>Complete Your Application</p>
+          </div>
+        </div>
+        <div style='background-color: #ffffff; padding: 25px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <h4 style='color: #5D4037; margin-top: 0;'>Dear {$firstname} {$lastname},</h4>
+          <p style='margin-bottom: 15px;'>We noticed that you started an India Visa application but haven't completed all the required steps.</p>
+          <div style='background-color: #EFEBE9; padding: 12px; border-left: 4px solid #5D4037; margin: 15px 0;'>
+            <p style='margin: 5px 0; font-weight: bold;'>Application Status: Incomplete</p>
+            <p style='margin: 5px 0;'>Application Reference: {$appid}</p>
+          </div>
+          <p style='margin-bottom: 15px;'>Your application is currently incomplete. To ensure your visa is processed, please complete all required information in the application form.</p>
+          <div style='margin: 20px 0;'>
+            <p style='margin-bottom: 10px;'><strong>Resume your application from where you left off:</strong></p>
+            <a href='{$statusUrl}' style='background-color:#5D4037; color: white; text-decoration: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Complete Application</a>
+          </div>
+          <p style='color: #666;'>⏰ <strong>Note:</strong> Incomplete applications cannot be processed. Please complete your application at your earliest convenience to avoid delays in your travel plans.</p>
+          <p style='color: #666; font-style: italic;'>If you encounter any issues completing your application, please contact our support team at <a href='mailto:{$support_email}' style='color: #5D4037; text-decoration: none;'>{$support_email}</a></p>
+          <p>Best regards,<br> India eVisa Team<br> <a href='{$website_url}' style='color: #5D4037; text-decoration: none;'>{$website_url}</a></p>
+        </div>
+        <div style='text-align: center; background-color: #5D4037; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 15px; color: #ffffff; font-size: 14px;'>
+          <strong>Need Assistance?</strong><br>
+          <strong>Email</strong>: <a href='mailto:{$support_email}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_email}</a><br>
+        </div>
+        <div style='margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 4px; text-align: center;'>
+          <p style='font-size: 14px;'>© ${new Date().getFullYear()} {$company_name}. All rights reserved.</p>
+        </div>
+      </div>`,
+    },
   },
 
   // Default values for template variables
@@ -206,12 +318,12 @@ async function prepareIndiaVisaEmailForApplicationCreation({
 
     const YOUR_DOMAIN = domain || 'Not Found';
 
-    // Prepare document URL for the application
-    // const documentUrl = `${YOUR_DOMAIN}docs/${applicationId}`;
-    // const statusUrl = `${YOUR_DOMAIN}status`;
-    // const paymentUrl = `${YOUR_DOMAIN}payment/${applicationId}`;
-
-    const statusUrl = `${YOUR_DOMAIN}`;
+    // Prepare URLs for different actions
+    const statusUrl = additionalData.statusUrl || `${YOUR_DOMAIN}`;
+    const documentUrl =
+      additionalData.documentUrl || `${YOUR_DOMAIN}/visa/step-six`;
+    const paymentUrl =
+      additionalData.paymentUrl || `${YOUR_DOMAIN}/visa/step-eight`;
 
     // Prepare template data
     const templateData = {
@@ -227,8 +339,8 @@ async function prepareIndiaVisaEmailForApplicationCreation({
       countryname: 'india',
       visa_name: visaType,
       statusUrl,
-      // documentUrl,
-      // paymentUrl,
+      documentUrl,
+      paymentUrl,
       emailAddress: application.emailId,
       ...additionalData,
     };
@@ -253,7 +365,7 @@ async function prepareIndiaVisaEmailForApplicationCreation({
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
-    console.error('Error preparing Ethiopia visa email:', error);
+    console.error('Error preparing India visa email:', error);
     throw error;
   }
 }
@@ -410,4 +522,6 @@ export {
   sendIndiaVisaEmail,
   sendAdminAlert,
   retryOperation,
+  prepareIndiaVisaEmailForApplicationCreation,
+  sendIndiaEmail,
 };
