@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-import { customAlphabet } from 'nanoid';
-const nanoid = customAlphabet('1234567890', 7);
+import mongoose from "mongoose";
+import { customAlphabet } from "nanoid";
+const nanoid = customAlphabet("1234567890", 7);
 const { Schema } = mongoose;
 
 const kenyaVisaApplicationSchema = new Schema(
@@ -8,7 +8,7 @@ const kenyaVisaApplicationSchema = new Schema(
     _id: {
       type: String,
       default: function () {
-        return 'KENeTa' + nanoid();
+        return "KENeTa" + nanoid();
       },
     },
     emailAddress: {
@@ -20,66 +20,66 @@ const kenyaVisaApplicationSchema = new Schema(
     lastExitUrl: {
       type: String,
       true: true,
-      default: 'visa-details',
+      default: "visa-details",
       lowercase: true,
     },
     visaDetails: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaVisaDetails',
+      ref: "KenyaVisaDetails",
     },
     arrivalInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaArrivalInfo',
+      ref: "KenyaArrivalInfo",
     },
     personalInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaPersonalInfo',
+      ref: "KenyaPersonalInfo",
     },
     passportInfo: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaPassportInfo',
+      ref: "KenyaPassportInfo",
     },
     documents: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaVisaDocuments',
+      ref: "KenyaVisaDocuments",
     },
     govRefDetails: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaGovRefDetails',
+      ref: "KenyaGovRefDetails",
     },
     declaration: {
       type: Schema.Types.ObjectId,
-      ref: 'KenyaDeclaration',
+      ref: "KenyaDeclaration",
     },
     additionalApplicants: [
       {
         personalInfo: {
           type: Schema.Types.ObjectId,
-          ref: 'KenyaPersonalInfo',
+          ref: "KenyaPersonalInfo",
         },
         passportInfo: {
           type: Schema.Types.ObjectId,
-          ref: 'KenyaPassportInfo',
+          ref: "KenyaPassportInfo",
         },
         documents: {
           type: Schema.Types.ObjectId,
-          ref: 'KenyaVisaDocuments',
+          ref: "KenyaVisaDocuments",
         },
         govRefDetails: {
           type: Schema.Types.ObjectId,
-          ref: 'KenyaGovRefDetails',
+          ref: "KenyaGovRefDetails",
         },
       },
     ],
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'failed'],
-      default: 'pending',
+      enum: ["pending", "paid", "failed"],
+      default: "pending",
     },
     paymentMethod: {
       type: String,
-      enum: ['stripe', 'razorpay'],
-      default: 'stripe',
+      enum: ["stripe", "razorpay"],
+      default: "stripe",
     },
     paymentId: {
       type: String,
@@ -93,8 +93,27 @@ const kenyaVisaApplicationSchema = new Schema(
     },
     applicationStatus: {
       type: String,
-      enum: ['incomplete', 'submitted', 'processing', 'approved', 'rejected'],
-      default: 'incomplete',
+      enum: [
+        "incomplete",
+        "submitted",
+        "pending document",
+        "on hold",
+        "pending",
+        "form filled",
+        "processed",
+        "future processing",
+        "visa granted",
+        "visa email sent",
+        "escalated",
+        "visa declined",
+        "refund pending",
+        "refund completed",
+        "payment disputed",
+        "miscellaneous",
+        "not interested",
+        "chargeback",
+      ],
+      default: "incomplete",
     },
     noOfVisa: {
       type: Number,
@@ -109,7 +128,7 @@ const kenyaVisaApplicationSchema = new Schema(
 );
 
 // Add virtual property to check if application is complete
-kenyaVisaApplicationSchema.virtual('isComplete').get(function () {
+kenyaVisaApplicationSchema.virtual("isComplete").get(function () {
   return !!(
     this.visaDetails &&
     this.arrivalInfo &&
@@ -119,7 +138,7 @@ kenyaVisaApplicationSchema.virtual('isComplete').get(function () {
 });
 
 // Pre-save middleware to update noOfVisa based on additionalApplicants
-kenyaVisaApplicationSchema.pre('save', function (next) {
+kenyaVisaApplicationSchema.pre("save", function (next) {
   // Primary applicant counts as 1
   let totalApplicants = 1;
 
@@ -127,7 +146,7 @@ kenyaVisaApplicationSchema.pre('save', function (next) {
   if (this.additionalApplicants && this.additionalApplicants.length > 0) {
     // Only count additional applicants that have both personalInfo and passportInfo
     const validAdditionalApplicants = this.additionalApplicants.filter(
-      applicant => applicant.personalInfo && applicant.passportInfo
+      (applicant) => applicant.personalInfo && applicant.passportInfo
     );
     totalApplicants += validAdditionalApplicants.length;
   }
@@ -139,7 +158,7 @@ kenyaVisaApplicationSchema.pre('save', function (next) {
 });
 
 const KenyaVisaApplication = mongoose.model(
-  'KenyaVisaApplication',
+  "KenyaVisaApplication",
   kenyaVisaApplicationSchema
 );
 export default KenyaVisaApplication;
