@@ -15,7 +15,12 @@ const egyptDeclarationController = {
                 deportedFromEgyptOrOtherCountry,
                 deportedDateFrom,
                 deportedDateTo,
-                whoIsPaying
+                whoIsPaying,
+                hostType,
+                hostName,
+                hostPhoneNumber,
+                hostEmail,
+                hostAddress
             } = req.body;
 
             // Validate required fields
@@ -41,7 +46,12 @@ const egyptDeclarationController = {
                 deportedFromEgyptOrOtherCountry,
                 deportedDateFrom,
                 deportedDateTo,
-                whoIsPaying
+                whoIsPaying,
+                hostType,
+                hostName,
+                hostPhoneNumber,
+                hostEmail,
+                hostAddress
             });
 
             const egyptDeclarationResult = await egyptDeclaration.save();
