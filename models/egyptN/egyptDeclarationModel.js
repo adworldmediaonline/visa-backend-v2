@@ -40,6 +40,26 @@ const EgyptDeclarationSchema = new Schema(
         whoIsPaying: {
             type: String,
             required: false
+        },
+        hostType: {
+            type: String,
+            required: false
+        },
+        hostName: {
+            type: String,
+            required: false
+        },
+        hostPhoneNumber: {
+            type: String,
+            required: false
+        },
+        hostEmail: {
+            type: String,
+            required: false
+        },
+        hostAddress: {
+            type: String,
+            required: false
         }
     },
     { timestamps: true }
