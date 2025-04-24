@@ -222,6 +222,43 @@ const indiaVisaEmailConfig = {
         </div>
       </div>`,
     },
+
+    indiaPaymentConfirmation: {
+      subject: 'Payment Confirmation - India Visa Application #{$appid}',
+      template: `<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 10px auto; padding: 15px; line-height: 1.5; color: #333; background-color: #f9f9f9;'>
+        <div style='text-align: center; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <img src='{$logo_url}' alt='{$company_name} Logo' style='max-width: 120px; height: auto;'>
+          <div style='text-align: center; background-color: #e8f5e9; padding: 10px; margin:10px; border-radius: 8px;'>
+            <p style='color: #2E7D32; margin-top: 12px; font-size:20px; font-weight: bold;'>Payment Successful</p>
+          </div>
+        </div>
+        <div style='background-color: #ffffff; padding: 25px; margin-top: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+          <h4 style='color: #2E7D32; margin-top: 0;'>Dear {$firstname} {$lastname},</h4>
+          <p style='margin-bottom: 15px;'>Thank you for your payment for your India Visa application.</p>
+          <div style='background-color: #e8f5e9; padding: 12px; border-left: 4px solid #2E7D32; margin: 15px 0;'>
+            <p style='margin: 5px 0; font-weight: bold;'>Payment Status: Confirmed</p>
+            <p style='margin: 5px 0;'>Application Reference: {$appid}</p>
+            <p style='margin: 5px 0;'>Payment Date: {$paymentDate}</p>
+            <p style='margin: 5px 0;'>Amount Paid: {$paymentAmount}</p>
+          </div>
+          <p style='margin-bottom: 15px;'>Your payment has been successfully processed and your visa application is now under review. Our team will start processing your application immediately.</p>
+          <div style='margin: 20px 0;'>
+            <p style='margin-bottom: 10px;'><strong>Track your application status using the link below:</strong></p>
+            <a href='{$statusUrl}' style='background-color:#2E7D32; color: white; text-decoration: none; padding: 12px 25px; font-size: 16px; border-radius: 5px; display: inline-block; font-weight: bold;'>Check Application Status</a>
+          </div>
+          <p style='color: #666;'>You will receive updates regarding your visa application process via email. Please ensure that the email address you provided remains accessible.</p>
+          <p style='color: #666; font-style: italic;'>If you have any questions about your application, please contact our support team at <a href='mailto:{$support_email}' style='color: #2E7D32; text-decoration: none;'>{$support_email}</a></p>
+          <p>Best regards,<br> India eVisa Team<br> <a href='{$website_url}' style='color: #2E7D32; text-decoration: none;'>{$website_url}</a></p>
+        </div>
+        <div style='text-align: center; background-color: #2E7D32; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 15px; color: #ffffff; font-size: 14px;'>
+          <strong>Need Assistance?</strong><br>
+          <strong>Email</strong>: <a href='mailto:{$support_email}' style='color:#ffffff;text-decoration:none' target='_blank'>{$support_email}</a><br>
+        </div>
+        <div style='margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 4px; text-align: center;'>
+          <p style='font-size: 14px;'>© ${new Date().getFullYear()} {$company_name}. All rights reserved.</p>
+        </div>
+      </div>`,
+    },
   },
 
   // Default values for template variables
@@ -332,8 +369,8 @@ async function prepareIndiaVisaEmailForApplicationCreation({
         'https://media.istockphoto.com/id/472317739/vector/flag-of-india.jpg?s=1024x1024&w=is&k=20&c=s2bakabBV0c1wpyd6Cq4Al7JAo0aSYJ1Jw7DJfJN3GE=',
       support_email: hostingerSupportEmail,
       website_url: YOUR_DOMAIN ?? '',
-      firstname: application?.emailId?.split('@')[0] || 'Applicant',
-      lastname: application?.emailId?.split('@')[1] || '',
+      firstname: application?.emailId,
+      lastname: '',
       appid: applicationId,
       Countryname: 'India',
       countryname: 'india',
@@ -408,44 +445,7 @@ async function sendIndiaApplicationConfirmation({
   return await sendIndiaEmail({ emailData, domain });
 }
 
-const sendIndiaVisaPaymentConfirmationEmail = async (email, id, domainUrl) => {
-  return retryOperation(async () => {
-    const transporter = await createTransporter(domainUrl);
-
-    const mailOptions = {
-      from: transporter.options.auth.user,
-      to: email,
-      subject: 'India eVisa Payment Confirmation',
-      html: `<p>Dear Applicant,</p>
-             <p>Thank you for your payment. Your India eVisa application has been received and is now being processed.</p>
-             <p>Your Application ID: <strong>${id}</strong></p>
-             <p>Please keep this ID for future reference. You will be notified via email about the status of your application.</p>
-             <p>Best regards,<br>India eVisa Team</p>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    return true;
-  }).catch(error => {
-    console.error('Email sending error after multiple retries:', error);
-    // Send alert to admin about persistent email failure
-    try {
-      sendAdminAlert(
-        'Email Sending Failure',
-        {
-          error: error.message,
-          email,
-          applicationId: id,
-          domainUrl,
-        },
-        domainUrl
-      );
-    } catch (alertError) {
-      console.error('Failed to send alert about email failure:', alertError);
-    }
-    return false;
-  });
-};
-
+// not use below function deprecated
 const sendIndiaVisaEmail = async (email, subject, html, domainUrl) => {
   const transporter = await createTransporter(domainUrl);
   const mailOptions = {
@@ -516,12 +516,72 @@ const sendAdminAlert = async (subject, message, domainUrl) => {
   }
 };
 
+// Function to send payment confirmation email
+const sendIndiaVisaPaymentConfirmationEmail = async (
+  application,
+  session,
+  domainUrl,
+  hostingerSupportEmail
+) => {
+  try {
+    if (!application || !session || !domainUrl) {
+      throw new Error(
+        'Missing required parameters for payment confirmation email'
+      );
+    }
+
+    console.log(
+      `Preparing payment confirmation email for ${application.emailId}`
+    );
+
+    // Format payment date for display
+    const paymentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    // Prepare email data
+    const emailData = await prepareIndiaVisaEmailForApplicationCreation({
+      applicationId: application._id,
+      templateKey: 'indiaPaymentConfirmation',
+      additionalData: {
+        paymentDate: paymentDate,
+        paymentAmount: `$${session.amount_total / 100}`,
+        firstname: application.step2?.firstName || application.emailId,
+        lastname: application.step2?.lastName || '',
+      },
+      domain: domainUrl,
+      hostingerSupportEmail,
+    });
+
+    // Send the email with retry mechanism
+    try {
+      return await retryOperation(async () => {
+        const result = await sendIndiaEmail({ emailData, domain: domainUrl });
+        console.log(
+          `Payment confirmation email sent successfully to ${application.emailId}`
+        );
+        return result;
+      });
+    } catch (error) {
+      console.error(
+        `Failed to send payment confirmation email after retries: ${error.message}`
+      );
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error sending payment confirmation email:', error);
+    throw error;
+  }
+};
+
 export {
   sendIndiaApplicationConfirmation,
-  sendIndiaVisaPaymentConfirmationEmail,
   sendIndiaVisaEmail,
   sendAdminAlert,
   retryOperation,
   prepareIndiaVisaEmailForApplicationCreation,
   sendIndiaEmail,
+  sendIndiaVisaPaymentConfirmationEmail,
 };

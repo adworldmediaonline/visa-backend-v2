@@ -5,6 +5,7 @@ import {
   sendIndiaVisaPaymentConfirmationEmail,
   sendAdminAlert,
 } from '../../mailConfig/mail.config.js';
+import { sendEmailBasedOnDomain } from '../../utils/sendEmailBasedOnDomain.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY_LIVE);
 
@@ -569,11 +570,21 @@ const handleCompletedCheckout = async (session, isRetry = false) => {
 
       // Send confirmation email
       console.log(`Sending confirmation email to: ${user.emailId}`);
-      await sendIndiaVisaPaymentConfirmationEmail(
-        user.emailId,
-        orderId,
-        domainUrl
-      );
+
+      // Send payment confirmation email
+      try {
+        const { HOSTINGER_EMAIL } = sendEmailBasedOnDomain(domainUrl);
+        await sendIndiaVisaPaymentConfirmationEmail(
+          user,
+          session,
+          domainUrl,
+          HOSTINGER_EMAIL
+        );
+        console.log('Payment confirmation email sent successfully');
+      } catch (emailError) {
+        console.error('Failed to send payment confirmation email:', emailError);
+        // Don't throw an error here, continue processing
+      }
 
       // Log successful processing
       console.log(

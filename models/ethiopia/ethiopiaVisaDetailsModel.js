@@ -3,32 +3,37 @@ const { Schema } = mongoose;
 
 const ethiopiaVisaDetailsSchema = new Schema(
   {
-    formId: { 
-      type: String, 
+    formId: {
+      type: String,
       required: true,
-      ref: 'EthiopiaVisaApplication'
+      ref: 'EthiopiaVisaApplication',
     },
-    visaType: { 
-      type: String, 
-      required: true 
+    visaType: {
+      type: String,
+      required: true,
     },
-    visaValidity: { 
-      type: String, 
-      required: true 
+    visaValidity: {
+      type: String,
+      required: true,
     },
-    companyReferenceNumber: { 
-      type: String 
+    companyReferenceNumber: {
+      type: String,
     },
-    visaFee: { 
-      type: Number, 
-      required: true 
+    visaFee: {
+      type: Number,
+      required: true,
     },
-    attachments: [{ 
-      type: String 
-    }],
+    attachments: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );
 
-const EthiopiaVisaDetails = mongoose.model('EthiopiaVisaDetails', ethiopiaVisaDetailsSchema);
+const EthiopiaVisaDetails = mongoose.model(
+  'EthiopiaVisaDetails',
+  ethiopiaVisaDetailsSchema
+);
 export default EthiopiaVisaDetails;
