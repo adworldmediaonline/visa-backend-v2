@@ -6,26 +6,28 @@ const KenyaVisaDetailsSchema = new Schema(
     formId: {
       type: String,
       required: true,
-      ref: 'KenyaVisaApplication'
+      ref: 'KenyaVisaApplication',
     },
     visaType: {
       type: String,
-      required: false
+      required: false,
     },
     visaValidity: {
       type: String,
-      required: false
+      required: false,
     },
     companyReferenceNumber: {
-      type: String
+      type: String,
     },
     visaFee: {
       type: Number,
-      required: false
+      required: false,
     },
-    attachments: [{
-      type: String
-    }],
+    attachments: [
+      {
+        type: String,
+      },
+    ],
     reasonForTravel: {
       type: String,
       enum: [
@@ -40,13 +42,16 @@ const KenyaVisaDetailsSchema = new Schema(
         'Medical Care',
         'Religious Visit',
         'Study / Education',
-        'Transit'
+        'Transit',
       ],
-      required: true
-    }
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-const KenyaVisaDetails = mongoose.model('KenyaVisaDetails', KenyaVisaDetailsSchema);
+const KenyaVisaDetails = mongoose.model(
+  'KenyaVisaDetails',
+  KenyaVisaDetailsSchema
+);
 export default KenyaVisaDetails;
