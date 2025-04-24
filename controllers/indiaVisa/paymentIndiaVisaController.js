@@ -153,6 +153,7 @@ const createIndiaVisaCheckoutSession = async (req, res, next) => {
       indiaVisaModel.visaService,
       indiaVisaModel.eTouristVisa
     );
+    //ss
 
     const sessionParams = {
       payment_method_types: ['card'],
