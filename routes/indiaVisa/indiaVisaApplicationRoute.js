@@ -33,4 +33,17 @@ indiaVisaRouter
   .route('/send-reminder-emails')
   .post(indiaVisaApplicationController.sendReminderEmails);
 
+// Send email to individual visa applicant
+indiaVisaRouter
+  .route('/applications/:id/remind/incomplete')
+  .post(indiaVisaApplicationController.sendIncompleteApplicationReminderEmail);
+
+indiaVisaRouter
+  .route('/applications/:id/remind/documents')
+  .post(indiaVisaApplicationController.sendDocsReminderEmail);
+
+indiaVisaRouter
+  .route('/applications/:id/remind/payment')
+  .post(indiaVisaApplicationController.sendPaymentReminderEmail);
+
 export default indiaVisaRouter;
