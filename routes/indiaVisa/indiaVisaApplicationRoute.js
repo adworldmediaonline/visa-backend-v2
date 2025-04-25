@@ -23,6 +23,11 @@ indiaVisaRouter
   .route('/applications/:id')
   .get(indiaVisaApplicationController.getIndianVisaApplicationById);
 
+// Update Status of Indian visa application
+indiaVisaRouter
+  .route('/applications/:id/status')
+  .put(indiaVisaApplicationController.updateIndianVisaApplicationStatus);
+
 // Send emails to visa applicants
 indiaVisaRouter
   .route('/applications/send-emails')

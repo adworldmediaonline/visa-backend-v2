@@ -82,6 +82,49 @@ const indiaVisaApplicationController = {
     }
   },
 
+  updateIndianVisaApplicationStatus: async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const { status } = req.body;
+
+      if (!status) {
+        return res.status(400).json({
+          success: false,
+          message: 'Status is required',
+          statusCode: 400
+        })
+      }
+
+      const application = await VisaRequestForm.findById(applicationId);
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Application not found',
+          statusCode: 404
+        })
+      }
+
+      // Update the application status
+      application.visaStatus = status;
+      await application.save();
+
+      return res.status(200).json({
+        success: true,
+        success: true,
+        message: 'Application status updated successfully',
+        statusCode: 200
+      })
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error while updating application status',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+
   sendReminderEmails: async (req, res) => {
     try {
       // Get email types to send from request body, with defaults if not specified
