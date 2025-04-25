@@ -296,6 +296,195 @@ const indiaVisaApplicationController = {
     }
   },
 
+  sendDocsReminderEmail: async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const application = await VisaRequestForm.findById(applicationId)
+        .populate('step2')
+        .populate('step3')
+        .populate('step4')
+        .populate('step5')
+        .populate('step6');
+
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Application not found',
+          statusCode: 404,
+        });
+      }
+
+      const domain = process.env.TRAVEL_TO_INDIA_SERVICES_DOMAIN_URL;
+      const { HOSTINGER_EMAIL } = req.mailAuth || {};
+
+      // Prepare email data for document reminder
+      const emailData = await prepareIndiaVisaEmailForApplicationCreation({
+        applicationId: application._id,
+        templateKey: 'indiaDocumentReminder',
+        additionalData: {
+          documentUrl: `${domain}/visa/step-six`,
+        },
+        domain,
+        hostingerSupportEmail: HOSTINGER_EMAIL,
+      });
+
+      // Send the email
+      const emailSent = await sendIndiaEmail({ emailData, domain });
+
+      if (!emailSent) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to send document reminder email',
+          statusCode: 500,
+        });
+      }
+
+      // Update the application to record that a reminder was sent
+      await VisaRequestForm.findByIdAndUpdate(applicationId, {
+        lastReminderSent: new Date(),
+        $push: { reminderHistory: { type: 'document', sentAt: new Date() } }
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Document reminder email sent successfully',
+        statusCode: 200,
+      });
+    } catch (error) {
+      console.error('Error sending reminder email:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error while sending reminder email',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+
+  sendPaymentReminderEmail: async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const application = await VisaRequestForm.findById(applicationId)
+        .populate('step2')
+        .populate('step3')
+        .populate('step4')
+        .populate('step5')
+        .populate('step6');
+
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Application not found',
+          statusCode: 404,
+        });
+      }
+
+      const domain = process.env.TRAVEL_TO_INDIA_SERVICES_DOMAIN_URL;
+      const { HOSTINGER_EMAIL } = req.mailAuth || {};
+
+      // Prepare email data for payment reminder
+      const emailData = await prepareIndiaVisaEmailForApplicationCreation({
+        applicationId: application._id,
+        templateKey: 'indiaPaymentReminder',
+        additionalData: {
+          paymentUrl: `${domain}/visa/step-eight`,
+        },
+        domain,
+        hostingerSupportEmail: HOSTINGER_EMAIL,
+      });
+
+      // Send the email
+      const emailSent = await sendIndiaEmail({ emailData, domain });
+
+      if (!emailSent) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to send payment reminder email',
+          statusCode: 500,
+        });
+      }
+
+      // Update the application to record that a reminder was sent
+      await VisaRequestForm.findByIdAndUpdate(applicationId, {
+        lastReminderSent: new Date(),
+        $push: { reminderHistory: { type: 'payment', sentAt: new Date() } }
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: 'Payment reminder email sent successfully',
+        statusCode: 200,
+      });
+    } catch (error) {
+      console.error('Error sending payment reminder email:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error while sending payment reminder email',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+
+  sendIncompleteApplicationReminderEmail: async (req, res) => {
+    try {
+      const applicationId = req.params.id;
+      const application = await VisaRequestForm.findById(applicationId)
+        .populate('step2')
+        .populate('step3')
+        .populate('step4')
+        .populate('step5')
+        .populate('step6');
+
+      if (!application) {
+        return res.status(404).json({
+          success: false,
+          message: 'Application not found',
+          statusCode: 404,
+        });
+      }
+
+      const domain = process.env.TRAVEL_TO_INDIA_SERVICES_DOMAIN_URL;
+      const { HOSTINGER_EMAIL } = req.mailAuth || {};
+
+      // Prepare email data for incomplete application reminder
+      const emailData = await prepareIndiaVisaEmailForApplicationCreation({
+        applicationId: application._id,
+        templateKey: 'indiaIncompleteFormReminder',
+        additionalData: {
+          statusUrl: `${domain}/visa/${application.lastExitStepUrl?.replace('/visa/', '')}`,
+        },
+        domain,
+        hostingerSupportEmail: HOSTINGER_EMAIL,
+      });
+
+      // Send the email
+      const emailSent = await sendIndiaEmail({ emailData, domain });
+
+      if (!emailSent) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to send incomplete application reminder email',
+          statusCode: 500,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Incomplete application reminder email sent successfully',
+        statusCode: 200,
+      });
+    } catch (error) {
+      console.error('Error sending incomplete application reminder email:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Internal server error while sending incomplete application reminder email',
+        error: error.message,
+        statusCode: 500,
+      });
+    }
+  },
+
   sendEmailToIndianVisaApplication: async (req, res) => {
     res.status(200).json({
       success: true,
