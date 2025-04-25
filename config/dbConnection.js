@@ -4,16 +4,12 @@ const dbConnect = async () => {
   try {
     mongoose.set('strictQuery', false);
 
-    // Enhanced connection options
     const connectOptions = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 15000, // 15 seconds
-      socketTimeoutMS: 45000, // 45 seconds
-      heartbeatFrequencyMS: 10000, // 10 seconds
+      serverSelectionTimeoutMS: 30000, // Increased to 30 seconds
+      socketTimeoutMS: 60000, // Increased to 60 seconds
+      heartbeatFrequencyMS: 10000,
       retryWrites: true,
       maxPoolSize: 10,
-      // Force node to use IPv4 over IPv6
       family: 4,
     };
 
@@ -46,13 +42,13 @@ const dbConnect = async () => {
     // This allows the server to still handle API requests even if DB is down
 
     // Optional: Set a reconnection timer
-    console.log('Will attempt to reconnect to MongoDB in 10 seconds');
+    console.log('Will attempt to reconnect to MongoDB in 15 seconds');
     setTimeout(() => {
       console.log('Attempting MongoDB reconnection...');
       dbConnect().catch(err => {
         console.error('Reconnection attempt failed:', err.message);
       });
-    }, 10000);
+    }, 15000);
   }
 };
 
