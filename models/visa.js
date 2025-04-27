@@ -167,6 +167,10 @@ const visaRequestFormSchema = new mongoose.Schema(
     step5: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm5' },
     step6: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm6' },
     step8: { type: Schema.Types.ObjectId, ref: 'VisaRequestForm8' },
+    govRefDetails: {
+      type: Schema.Types.ObjectId,
+      ref: 'IndiaGovRefDetails',
+    },
   },
   {
     timestamps: true,

@@ -56,6 +56,7 @@ import egyptGovRefDetailsRouter from './routes/egyptN/egyptGovRefDetailsRoute.js
 import egyptDeclarationRouter from './routes/egyptN/egyptDeclarationRoutes.js';
 import egyptEmailRouter from './routes/egyptN/egyptEmailRoutes.js';
 import egyptVisaApplicationRouterN from './routes/egyptN/egyptVisaApplicationRoute.js';
+import indiaGovRefDetailsRouter from './routes/indiaVisa/indiaGovRefDetailsRoute.js';
 
 dotenv.config();
 dbConnect();
@@ -176,6 +177,7 @@ sendMailEveryDayForPendingPayment();
 // india visa routes
 app.use('/api/v1/india-visa', indiaVisaRouter);
 app.use('/api/v1/india-visa/payments', indiaVisaPaymentRouter);
+app.use('/api/v1/india-visa/gov-ref', indiaGovRefDetailsRouter);
 // Webhook route is now defined at the top of the file
 
 // for admin dashboard

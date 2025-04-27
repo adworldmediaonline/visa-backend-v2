@@ -60,7 +60,8 @@ const visaRequestFormController = {
         .populate('step3')
         .populate('step4')
         .populate('step5')
-        .populate('step6');
+        .populate('step6')
+        .populate('govRefDetails');
 
       if (!form) {
         return res
@@ -176,7 +177,8 @@ const visaRequestFormController = {
         .populate('step3')
         .populate('step4')
         .populate('step5')
-        .populate('step6');
+        .populate('step6')
+        .populate('govRefDetails');
 
       if (!form) {
         return res.status(404).json({ error: 'Form not found' });

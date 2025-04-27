@@ -17,7 +17,8 @@ const indiaVisaApplicationController = {
         .populate('step3')
         .populate('step4')
         .populate('step5')
-        .populate('step6');
+        .populate('step6')
+        .populate('govRefDetails');
 
       if (!indianVisaApplications || indianVisaApplications.length === 0) {
         return res.status(404).json({
@@ -60,7 +61,12 @@ const indiaVisaApplicationController = {
         .populate('step3')
         .populate('step4')
         .populate('step5')
-        .populate('step6');
+        .populate('step6')
+        .populate('govRefDetails');
+
+      // console.log('====================================');
+      // console.log('indianVisaApplication', indianVisaApplication);
+      // console.log('====================================');
 
       if (!indianVisaApplication) {
         return res.status(404).json({
