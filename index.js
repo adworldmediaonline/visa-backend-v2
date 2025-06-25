@@ -56,6 +56,7 @@ import egyptGovRefDetailsRouter from './routes/egyptN/egyptGovRefDetailsRoute.js
 import egyptDeclarationRouter from './routes/egyptN/egyptDeclarationRoutes.js';
 import egyptEmailRouter from './routes/egyptN/egyptEmailRoutes.js';
 import egyptVisaApplicationRouterN from './routes/egyptN/egyptVisaApplicationRoute.js';
+import contactRouter from './routes/contactRoutes.js';
 
 dotenv.config();
 dbConnect();
@@ -210,6 +211,9 @@ app.use('/api/v1/egypt-visa/payments', egyptPaymentRouter);
 app.use('/api/v1/egypt-visa/gov-ref', egyptGovRefDetailsRouter);
 app.use('/api/v1/egypt-visa/declarations', egyptDeclarationRouter);
 app.use('/api/v1/egypt-visa/mail', egyptEmailRouter);
+
+// Contact Routes
+app.use('/api/contact', contactRouter);
 
 // 404 handler
 app.use((req, res) => {
