@@ -1,0 +1,142 @@
+{
+  "info": {
+    "name": "Visa Application System v2 API",
+    "description": "Complete API collection for testing the v2 visa application system endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "12345678-1234-1234-1234-123456789012",
+    "version": {
+      "major": 2,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8090/api/v2",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Get Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Countries",
+      "item": [
+        {
+          "name": "Get All Countries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/countries?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "countries"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Country",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"United States\",\n  \"isoCode\": \"US\",\n  \"iso3Code\": \"USA\",\n  \"flagUrl\": \"https://example.com/flags/us.png\",\n  \"dialCode\": \"+1\",\n  \"currency\": {\n    \"code\": \"USD\",\n    \"symbol\": \"$\",\n    \"name\": \"US Dollar\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/countries",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "countries"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Visa Types",
+      "item": [
+        {
+          "name": "Get All Visa Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/visa-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "visa-types"]
+            }
+          }
+        },
+        {
+          "name": "Create Visa Type",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tourist Visa\",\n  \"code\": \"TOURIST\",\n  \"description\": \"For tourism purposes\",\n  \"category\": \"tourist\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/visa-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "visa-types"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Visa Rules",
+      "item": [
+        {
+          "name": "Get All Visa Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/visa-rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "visa-rules"]
+            }
+          }
+        },
+        {
+          "name": "Check Visa Eligibility",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/visa-rules/check-eligibility?fromCountryId=60d5f8f8f8f8f8f8f8f8f8f8&toCountryId=60d5f8f8f8f8f8f8f8f8f8f9",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "visa-rules", "check-eligibility"],
+              "query": [
+                { "key": "fromCountryId", "value": "60d5f8f8f8f8f8f8f8f8f8f8" },
+                { "key": "toCountryId", "value": "60d5f8f8f8f8f8f8f8f8f8f9" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
