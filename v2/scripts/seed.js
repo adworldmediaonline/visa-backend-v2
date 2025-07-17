@@ -27,7 +27,7 @@ const sampleVisaRules = [
         processingTime: 'Immediate',
         fee: 1956.9,
         currency: 'INR',
-        governmentFeeDisplay: 'INR 1,956.90',
+        governmentFeeDisplay: 'INR 8,164.84',
         badges: [
           { label: 'Valid for 2 Years', color: 'blue' },
           { label: 'Multiple entry', color: 'green' },
@@ -46,6 +46,35 @@ const sampleVisaRules = [
           'The UK ETA lets you travel to the UK multiple times for up to 6 months at a time, with a validity of 2 years.',
         learnMore:
           'You do not need to apply for an ETA if you already have a UK visa that allows you to come to the UK.',
+        processingOptions: [
+          {
+            id: 'standard',
+            name: 'Standard',
+            fee: 8164.84,
+            currency: 'INR',
+            processingTime: 'Processed within 24 hours',
+            description: 'Standard processing time for your visa application',
+            isDefault: true,
+          },
+          {
+            id: 'rush',
+            name: 'Rush',
+            fee: 12701.37,
+            currency: 'INR',
+            processingTime: 'Processed within 4 hours',
+            description: 'Faster processing for urgent travel needs',
+            isDefault: false,
+          },
+          {
+            id: 'super_rush',
+            name: 'Super Rush',
+            fee: 16330.59,
+            currency: 'INR',
+            processingTime: 'Processed within 1 hour',
+            description: 'Fastest processing for immediate travel requirements',
+            isDefault: false,
+          },
+        ],
         formConfig: {
           fields: [
             {
@@ -110,122 +139,6 @@ const sampleVisaRules = [
         'Must have clean criminal record',
       ],
     },
-  },
-  {
-    passportCountry: {
-      name: 'India',
-      code: 'IN',
-      flag: '🇮🇳',
-    },
-    destinationCountry: {
-      name: 'United Kingdom',
-      code: 'GB',
-      flag: '🇬🇧',
-    },
-    visaRequired: true,
-    visaOptions: [
-      {
-        name: 'UK Standard Visitor Visa',
-        visaType: 'Tourist',
-        entryType: 'Multiple Entry',
-        validity: '6 Months',
-        stayPerVisit: 'Up to 6 months',
-        processingTime: '15-20 working days',
-        fee: 8500,
-        currency: 'INR',
-        governmentFeeDisplay: 'INR 8,500',
-        badges: [
-          { label: '6 Months validity', color: 'blue' },
-          { label: 'Multiple entry', color: 'green' },
-        ],
-        requiredDocuments: [
-          'Valid Passport',
-          'Digital Photograph',
-          'Bank Statements (6 months)',
-          'Employment Letter',
-          'Travel Itinerary',
-          'Hotel Bookings',
-        ],
-        description:
-          'Standard visitor visa for tourism, business visits, or visiting family and friends.',
-        eligibility:
-          'For Indian passport holders visiting the UK for short-term purposes.',
-        whatToKnow:
-          'You must show that you will leave the UK at the end of your visit and have enough money to support yourself.',
-        learnMore:
-          'Processing time may vary during peak seasons. Apply well in advance of your travel date.',
-        formConfig: {
-          fields: [
-            {
-              name: 'fullName',
-              label: 'Full Name',
-              type: 'text',
-              required: true,
-              placeholder: 'Enter your full name as per passport',
-            },
-            {
-              name: 'passportNumber',
-              label: 'Passport Number',
-              type: 'text',
-              required: true,
-            },
-            {
-              name: 'dateOfBirth',
-              label: 'Date of Birth',
-              type: 'date',
-              required: true,
-            },
-            {
-              name: 'email',
-              label: 'Email Address',
-              type: 'email',
-              required: true,
-            },
-            {
-              name: 'phoneNumber',
-              label: 'Phone Number',
-              type: 'tel',
-              required: true,
-            },
-            {
-              name: 'gender',
-              label: 'Gender',
-              type: 'select',
-              required: true,
-              options: [
-                { label: 'Male', value: 'male' },
-                { label: 'Female', value: 'female' },
-                { label: 'Other', value: 'other' },
-              ],
-            },
-            {
-              name: 'purposeOfVisit',
-              label: 'Purpose of Visit',
-              type: 'select',
-              required: true,
-              options: [
-                { label: 'Tourism', value: 'tourism' },
-                { label: 'Business', value: 'business' },
-                { label: 'Visiting Family/Friends', value: 'family' },
-                { label: 'Medical Treatment', value: 'medical' },
-              ],
-            },
-            {
-              name: 'passportUpload',
-              label: 'Passport Upload',
-              type: 'file',
-              required: true,
-            },
-            {
-              name: 'photoUpload',
-              label: 'Passport Photo',
-              type: 'file',
-              required: true,
-            },
-          ],
-        },
-      },
-    ],
   },
 ];
 

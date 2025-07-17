@@ -56,6 +56,17 @@ const visaOptionSchema = new mongoose.Schema({
   eligibility: { type: String },
   whatToKnow: { type: String },
   learnMore: { type: String },
+  processingOptions: [
+    {
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      fee: { type: Number, required: true },
+      currency: { type: String, default: 'INR' },
+      processingTime: { type: String, required: true },
+      description: { type: String },
+      isDefault: { type: Boolean, default: false },
+    },
+  ],
   formConfig: {
     fields: [formFieldSchema],
   },

@@ -1,5 +1,6 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
+import { sendApplicationStartEmail } from '../services/emailService.js';
 
 /**
  * Get visa rules for specific passport and destination countries
@@ -48,6 +49,7 @@ export const startApplication = async (req, res) => {
     const {
       passportCountry,
       destinationCountry,
+      emailAddress,
       source,
       userAgent,
       ipAddress,
@@ -63,12 +65,26 @@ export const startApplication = async (req, res) => {
     const application = new VisaApplication({
       passportCountry,
       destinationCountry,
+      emailAddress,
       source: source || 'mobile',
       userAgent,
       ipAddress,
     });
 
     await application.save();
+
+    // Send application start confirmation email if email address is provided
+    if (emailAddress) {
+      try {
+        await sendApplicationStartEmail(application.applicationId);
+        console.log(
+          `Application start email sent successfully for ${application.applicationId}`
+        );
+      } catch (emailError) {
+        console.error('Error sending application start email:', emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     res.status(201).json({
       success: true,
@@ -79,6 +95,7 @@ export const startApplication = async (req, res) => {
         destinationCountry: application.destinationCountry,
         status: application.status,
         stepCompleted: application.stepCompleted,
+        emailAddress: application.emailAddress,
         createdAt: application.createdAt,
       },
     });
@@ -106,6 +123,7 @@ export const updateApplication = async (req, res) => {
       visaOptionName,
       emailAddress,
       phoneNumber,
+      sendEmail = false, // Optional flag to send save and exit email
     } = req.body;
 
     // Build query - only check _id if it's a valid ObjectId format
@@ -123,6 +141,9 @@ export const updateApplication = async (req, res) => {
       });
     }
 
+    // Track if step has progressed for email trigger
+    const previousStepCompleted = application.stepCompleted;
+
     // Update form data if provided
     if (formData) {
       application.updateFormData(formData);
@@ -136,6 +157,23 @@ export const updateApplication = async (req, res) => {
     if (phoneNumber) application.phoneNumber = phoneNumber;
 
     await application.save();
+
+    // Send save and exit email if requested and email is available
+    if (
+      sendEmail &&
+      application.emailAddress &&
+      stepCompleted > previousStepCompleted
+    ) {
+      try {
+        await sendSaveAndExitEmail(application.applicationId);
+        console.log(
+          `Save and exit email sent successfully for ${application.applicationId}`
+        );
+      } catch (emailError) {
+        console.error('Error sending save and exit email:', emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     res.status(200).json({
       success: true,
