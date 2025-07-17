@@ -1,6 +1,9 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
-import { sendApplicationStartEmail } from '../services/emailService.js';
+import {
+  sendApplicationStartEmail,
+  sendSaveAndExitEmail,
+} from '../services/emailService.js';
 
 /**
  * Get visa rules for specific passport and destination countries
