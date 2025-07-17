@@ -57,9 +57,8 @@ import travelToIndiaServicesVisaRouter from './routes/travelToIndiaServicesVisaR
 import turkeyVisaApplicationRouter from './routes/turkey/turkeyVisaApplicationRoute.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import visaRouter from './routes/visa.js';
-
-// V2 Routes - New visa application system
-import v2Routes from './v2/routes/index.js';
+// V2 Routes - New centralized visa application system
+import visaV2Router from './v2/routes/visa.routes.js';
 
 dotenv.config();
 dbConnect();
@@ -119,6 +118,10 @@ app.use(
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome To Budgetree Api Test Server' });
 });
+
+// V2 Routes - New centralized visa application system
+app.use('/api/v2/visa', visaV2Router);
+
 app.use('/visa', visaRouter, temporaryExitRouter);
 app.use(
   '/visa/services-travel-india',
@@ -217,9 +220,6 @@ app.use('/api/v1/egypt-visa/mail', egyptEmailRouter);
 
 // Contact Routes
 app.use('/api/contact', contactRouter);
-
-// V2 API Routes - New visa application system
-app.use('/api/v2', v2Routes);
 
 // 404 handler
 app.use((req, res) => {
