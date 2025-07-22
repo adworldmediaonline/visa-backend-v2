@@ -72,6 +72,7 @@ export const startApplication = async (req, res) => {
       source: source || 'mobile',
       userAgent,
       ipAddress,
+      stepCompleted: 1, // Mark the first step as completed
     });
 
     await application.save();
