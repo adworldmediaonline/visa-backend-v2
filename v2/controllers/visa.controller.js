@@ -5,6 +5,23 @@ import {
   sendSaveAndExitEmail,
 } from '../services/emailService.js';
 
+function getNextStep(application) {
+  if (!application.visaType || !application.visaOptionName)
+    return 'visa-type-selection';
+  if (!application.formData?.tripDetails?.arrivalDate) return 'trip-details';
+  if (!application.documents || application.documents.length === 0)
+    return 'document-upload';
+  if (!application.formData?.personalDetails) return 'application-form';
+  if (!application.formData?.passportDetails) return 'passport-details';
+  if (
+    !application.formData?.travelers ||
+    application.formData.travelers.length === 0
+  )
+    return 'travelers-information';
+  if (!application.formData?.processingOption) return 'processing-time';
+  return 'order-review';
+}
+
 /**
  * Get visa rules for specific passport and destination countries
  * GET /api/v2/visa/rules?from=AU&to=GB
@@ -242,6 +259,7 @@ export const getApplication = async (req, res) => {
         createdAt: application.createdAt,
         lastUpdatedAt: application.lastUpdatedAt,
         submittedAt: application.submittedAt,
+        nextStep: getNextStep(application),
       },
     });
   } catch (error) {
