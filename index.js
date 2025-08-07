@@ -46,6 +46,7 @@ import omanVisaApplicationPeopleRouter from './routes/oman/omanVisaApplicationPe
 import omanVisaApplicationRouter from './routes/oman/omanVisaApplicationRoute.js';
 import paymentVisaApplicationRouter from './routes/payment/paymentRoute.js';
 import servicesIndiaTravelVisaRouter from './routes/servicesIndiaTravelVisaRoutes.js';
+import simpleUploadRouter from './routes/simpleUpload.routes.js';
 import singaporeVisaApplicationPeopleRouter from './routes/singapore/singaporeVisaApplicationPeopleRoute.js';
 import singaporeVisaApplicationRouter from './routes/singapore/singaporeVisaApplicationRoute.js';
 import touristIndividualRouter from './routes/srilanka/touristIndividual/touristIndividual.js';
@@ -105,7 +106,19 @@ webhookPaths.forEach(path => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Platform',
+      'X-Requested-With',
+    ],
+  })
+);
 app.use(cookieParser());
 
 app.use(
@@ -121,6 +134,9 @@ app.get('/', (req, res) => {
 
 // V2 Routes - New centralized visa application system
 app.use('/api/v2/visa', visaV2Router);
+
+// Simple Upload Routes - For testing file uploads
+app.use('/api/v2/simple-upload', simpleUploadRouter);
 
 app.use('/visa', visaRouter, temporaryExitRouter);
 app.use(
@@ -231,8 +247,11 @@ app.use((req, res) => {
   });
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on Port Number: ${port}`);
+  console.log(`Server accessible at:`);
+  console.log(`  - Local: http://localhost:${port}`);
+  console.log(`  - Network: http://192.168.31.81:${port}`);
 });
 
 export default app;
