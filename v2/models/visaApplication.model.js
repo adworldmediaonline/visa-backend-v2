@@ -67,8 +67,11 @@ const visaApplicationSchema = new mongoose.Schema(
       {
         name: { type: String, required: true },
         url: { type: String, required: true },
-        type: { type: String, required: true }, // 'passport', 'photo', 'document'
+        type: { type: String, required: true }, // 'passportPhoto', 'passportCopy', 'visaPhoto', 'supportingDocument'
         uploadedAt: { type: Date, default: Date.now },
+        publicId: { type: String }, // For Cloudinary
+        fileSize: { type: Number },
+        mimeType: { type: String },
       },
     ],
 
