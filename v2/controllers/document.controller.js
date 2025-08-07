@@ -33,7 +33,7 @@ export const getCloudinaryConfig = async (req, res) => {
       success: true,
       data: {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-        uploadPreset: 'visacollect_unsigned', // You need to create this preset in Cloudinary
+        uploadPreset: 'visacollect', // Use the actual preset from Cloudinary
       },
     });
   } catch (error) {

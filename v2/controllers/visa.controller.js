@@ -1,9 +1,5 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
-import {
-  sendApplicationStartEmail,
-  sendSaveAndExitEmail,
-} from '../services/emailService.js';
 
 function getNextStep(application) {
   if (!application.visaType || !application.visaOptionName)
@@ -95,6 +91,8 @@ export const startApplication = async (req, res) => {
     await application.save();
 
     // Send application start confirmation email if email address is provided
+    // TODO: Uncomment when email functionality is ready
+    /*
     if (emailAddress) {
       try {
         await sendApplicationStartEmail(application.applicationId);
@@ -106,6 +104,7 @@ export const startApplication = async (req, res) => {
         // Continue with the response even if email fails
       }
     }
+    */
 
     res.status(201).json({
       success: true,
@@ -180,6 +179,8 @@ export const updateApplication = async (req, res) => {
     await application.save();
 
     // Send save and exit email if requested and email is available
+    // TODO: Uncomment when email functionality is ready
+    /*
     if (
       sendEmail &&
       application.emailAddress &&
@@ -195,6 +196,7 @@ export const updateApplication = async (req, res) => {
         // Continue with the response even if email fails
       }
     }
+    */
 
     res.status(200).json({
       success: true,
