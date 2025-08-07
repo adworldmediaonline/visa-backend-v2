@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { PassThrough } from 'stream';
 import cloudinary from '../../config/cloudinary.js';
 import VisaApplication from '../models/visaApplication.model.js';
 
@@ -299,53 +300,42 @@ export const uploadDocument = async (req, res) => {
       });
     }
 
-    // Check Cloudinary configuration
-    console.log('☁️ Cloudinary config check:', {
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set',
-      apiKey: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Not set',
-      apiSecret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Not set',
-    });
-
     let result;
 
-    // Check if Cloudinary is configured
-    if (
-      !process.env.CLOUDINARY_CLOUD_NAME ||
-      !process.env.CLOUDINARY_API_KEY ||
-      !process.env.CLOUDINARY_API_SECRET
-    ) {
-      console.log('⚠️ Cloudinary not configured, using local file storage');
+    // Upload to Cloudinary using the same proven approach as main backend
+    try {
+      console.log('☁️ Uploading to Cloudinary...');
+      console.log(
+        '☁️ File buffer size:',
+        file.buffer ? file.buffer.length : 'No buffer'
+      );
 
-      // For testing, create a mock result
-      result = {
-        secure_url: `file://${file.path}`,
-        public_id: `local-${Date.now()}`,
-      };
-    } else {
-      try {
-        // Upload to Cloudinary
-        const uploadOptions = {
-          folder: `visa-applications/${application.applicationId}/${documentType}`,
-          resource_type: 'auto',
-          allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-          transformation: [{ quality: 'auto:good' }, { fetch_format: 'auto' }],
-        };
+      // Convert buffer to stream for Cloudinary upload
+      const bufferStream = new PassThrough();
+      bufferStream.end(file.buffer);
 
-        console.log('☁️ Uploading to Cloudinary with options:', uploadOptions);
-        console.log('☁️ File path:', file.path);
+      result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `visa-applications/${application.applicationId}/${documentType}`,
+            resource_type: 'auto',
+          },
+          (error, result) => {
+            if (error) {
+              console.error('❌ Cloudinary upload failed:', error);
+              reject(new Error(`Cloudinary upload failed: ${error.message}`));
+            } else {
+              console.log('✅ Cloudinary upload successful:', result.public_id);
+              resolve(result);
+            }
+          }
+        );
 
-        result = await cloudinary.uploader.upload(file.path, uploadOptions);
-        console.log('✅ Cloudinary upload successful:', result.public_id);
-      } catch (cloudinaryError) {
-        console.error('❌ Cloudinary upload failed:', cloudinaryError);
-
-        // Fallback to local storage
-        console.log('⚠️ Falling back to local file storage');
-        result = {
-          secure_url: `file://${file.path}`,
-          public_id: `local-${Date.now()}`,
-        };
-      }
+        bufferStream.pipe(uploadStream);
+      });
+    } catch (cloudinaryError) {
+      console.error('❌ Cloudinary upload failed:', cloudinaryError);
+      throw new Error(`Cloudinary upload failed: ${cloudinaryError.message}`);
     }
 
     // Validate that we have both url and publicId
@@ -367,7 +357,7 @@ export const uploadDocument = async (req, res) => {
       type: documentType,
       uploadedAt: new Date(),
       publicId: result.public_id,
-      fileSize: file.size,
+      fileSize: file.buffer ? file.buffer.length : 0,
       mimeType: file.mimetype,
     };
 
@@ -406,7 +396,7 @@ export const uploadDocument = async (req, res) => {
         url: result.secure_url,
         publicId: result.public_id,
         fileName: file.originalname,
-        fileSize: file.size,
+        fileSize: file.buffer ? file.buffer.length : 0,
         mimeType: file.mimetype,
         uploadedAt: new Date(),
       },

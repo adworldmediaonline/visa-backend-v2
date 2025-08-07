@@ -21,25 +21,19 @@ import {
 
 const router = express.Router();
 
-// Configure multer for file uploads
+// Configure multer for file uploads (using memory storage like main backend)
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      console.log('📁 Multer destination called for file:', file.originalname);
-      cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const filename = file.fieldname + '-' + uniqueSuffix + '-' + file.originalname;
-      console.log('📁 Multer filename generated:', filename);
-      cb(null, filename);
-    },
-  }),
+  storage: multer.memoryStorage(), // Use memory storage instead of disk
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
   fileFilter: (req, file, cb) => {
-    console.log('🔍 Multer fileFilter called for:', file.originalname, 'mimetype:', file.mimetype);
+    console.log(
+      '🔍 Multer fileFilter called for:',
+      file.originalname,
+      'mimetype:',
+      file.mimetype
+    );
     // Allow images and PDFs
     if (
       file.mimetype.startsWith('image/') ||
@@ -71,30 +65,35 @@ router.post('/documents/signature', getUploadSignature);
 router.post('/documents/save', saveDocumentInfo);
 
 // Legacy Document Upload Routes (using multer)
-router.post('/documents/upload', upload.single('document'), (req, res, next) => {
-  console.log('📤 Document upload route hit');
-  console.log('📤 Request body:', req.body);
-  console.log('📤 Request file:', req.file);
-  
-  // Handle multer errors
-  if (req.fileValidationError) {
-    console.log('❌ File validation error:', req.fileValidationError);
-    return res.status(400).json({
-      success: false,
-      message: req.fileValidationError,
-    });
-  }
-  
-  if (!req.file) {
-    console.log('❌ No file uploaded');
-    return res.status(400).json({
-      success: false,
-      message: 'No file uploaded',
-    });
-  }
-  
-  next();
-}, uploadDocument);
+router.post(
+  '/documents/upload',
+  upload.single('document'),
+  (req, res, next) => {
+    console.log('📤 Document upload route hit');
+    console.log('📤 Request body:', req.body);
+    console.log('📤 Request file:', req.file);
+
+    // Handle multer errors
+    if (req.fileValidationError) {
+      console.log('❌ File validation error:', req.fileValidationError);
+      return res.status(400).json({
+        success: false,
+        message: req.fileValidationError,
+      });
+    }
+
+    if (!req.file) {
+      console.log('❌ No file uploaded');
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      });
+    }
+
+    next();
+  },
+  uploadDocument
+);
 
 // Simple test endpoint for file upload
 router.post('/test-upload', upload.single('document'), (req, res) => {
@@ -102,14 +101,14 @@ router.post('/test-upload', upload.single('document'), (req, res) => {
     console.log('🧪 Test upload endpoint hit');
     console.log('🧪 Request body:', req.body);
     console.log('🧪 Request file:', req.file);
-    
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
         message: 'No file uploaded',
       });
     }
-    
+
     res.status(200).json({
       success: true,
       message: 'File uploaded successfully',
