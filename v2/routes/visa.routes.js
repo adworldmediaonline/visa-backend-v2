@@ -70,8 +70,10 @@ router.post(
   upload.single('document'),
   (req, res, next) => {
     console.log('📤 Document upload route hit');
+    console.log('📤 Request headers:', req.headers);
     console.log('📤 Request body:', req.body);
     console.log('📤 Request file:', req.file);
+    console.log('📤 Content-Type:', req.get('Content-Type'));
 
     // Handle multer errors
     if (req.fileValidationError) {
@@ -116,8 +118,7 @@ router.post('/test-upload', upload.single('document'), (req, res) => {
         fieldname: req.file.fieldname,
         originalname: req.file.originalname,
         mimetype: req.file.mimetype,
-        size: req.file.size,
-        path: req.file.path,
+        bufferSize: req.file.buffer ? req.file.buffer.length : 'No buffer',
       },
     });
   } catch (error) {
@@ -128,6 +129,21 @@ router.post('/test-upload', upload.single('document'), (req, res) => {
       error: error.message,
     });
   }
+});
+
+// Health check endpoint for document upload
+router.get('/documents/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Document upload service is healthy',
+    timestamp: new Date().toISOString(),
+    cloudinary: {
+      configured: !!(
+        process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY
+      ),
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Not set',
+    },
+  });
 });
 
 // Simple health check endpoint

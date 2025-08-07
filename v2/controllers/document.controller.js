@@ -99,7 +99,10 @@ export const getUploadSignature = async (req, res) => {
     const signature = crypto
       .createHash('sha1')
       .update(
-        `folder=${folder}&resource_type=auto&timestamp=${timestamp}${process.env.CLOUDINARY_API_SECRET}`
+        Object.keys(params)
+          .sort()
+          .map(key => `${key}=${params[key]}`)
+          .join('&') + process.env.CLOUDINARY_API_SECRET
       )
       .digest('hex');
 
@@ -108,23 +111,23 @@ export const getUploadSignature = async (req, res) => {
       data: {
         signature,
         timestamp,
-        apiKey: process.env.CLOUDINARY_API_KEY,
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         folder,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+        apiKey: process.env.CLOUDINARY_API_KEY,
       },
     });
   } catch (error) {
-    console.error('❌ Error generating signature:', error);
+    console.error('❌ Error getting upload signature:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to generate upload signature',
+      message: 'Failed to get upload signature',
       error: error.message,
     });
   }
 };
 
 /**
- * Save document info after Cloudinary upload
+ * Save document info after direct Cloudinary upload
  * POST /api/v2/visa/documents/save
  */
 export const saveDocumentInfo = async (req, res) => {
@@ -140,7 +143,7 @@ export const saveDocumentInfo = async (req, res) => {
       });
     }
 
-    // Find the application by custom applicationId
+    // Find the application
     const application = await VisaApplication.findOne({
       applicationId: applicationId,
     });
@@ -152,56 +155,39 @@ export const saveDocumentInfo = async (req, res) => {
       });
     }
 
-    // Validate that we have both url and publicId
-    if (!cloudinaryData.secure_url || !cloudinaryData.public_id) {
-      console.error('❌ Missing required fields from Cloudinary:', {
-        secure_url: cloudinaryData.secure_url,
-        public_id: cloudinaryData.public_id,
-      });
-      return res.status(500).json({
-        success: false,
-        message: 'Invalid response from Cloudinary - missing required fields',
-      });
-    }
-
-    // Save document info to application with both url and publicId
+    // Prepare document data
     const documentData = {
-      name: fileName || cloudinaryData.original_filename || 'document',
+      name: fileName || 'document',
       url: cloudinaryData.secure_url,
       type: documentType,
       uploadedAt: new Date(),
       publicId: cloudinaryData.public_id,
-      fileSize: cloudinaryData.bytes,
-      mimeType: mimeType || cloudinaryData.format,
+      fileSize: cloudinaryData.bytes || 0,
+      mimeType: mimeType || 'image/jpeg',
     };
 
-    // Validate document data before saving
+    // Validate document data
     if (!validateDocumentData(documentData)) {
-      return res.status(500).json({
+      return res.status(400).json({
         success: false,
-        message: 'Invalid document data - missing required fields',
+        message: 'Invalid document data',
       });
     }
 
-    console.log('💾 Saving document to database:', {
-      name: documentData.name,
-      url: documentData.url,
-      publicId: documentData.publicId,
-      type: documentData.type,
-    });
-
-    await VisaApplication.findByIdAndUpdate(application._id, {
-      $push: { documents: documentData },
-    });
-
-    console.log(
-      `Document saved successfully for application ${application.applicationId}:`,
+    // Save to database
+    await VisaApplication.findByIdAndUpdate(
+      application._id,
       {
-        documentType,
-        publicId: cloudinaryData.public_id,
-        url: cloudinaryData.secure_url,
-      }
+        $push: { documents: documentData },
+      },
+      { new: true }
     );
+
+    console.log('✅ Document info saved to database:', {
+      applicationId: application.applicationId,
+      documentType,
+      publicId: cloudinaryData.public_id,
+    });
 
     res.status(200).json({
       success: true,
@@ -226,7 +212,7 @@ export const saveDocumentInfo = async (req, res) => {
 };
 
 /**
- * Upload document to Cloudinary (legacy - using multer)
+ * Upload document using multer (robust implementation)
  * POST /api/v2/visa/documents/upload
  */
 export const uploadDocument = async (req, res) => {
@@ -237,8 +223,7 @@ export const uploadDocument = async (req, res) => {
           fieldname: req.file.fieldname,
           originalname: req.file.originalname,
           mimetype: req.file.mimetype,
-          size: req.file.size,
-          path: req.file.path,
+          bufferSize: req.file.buffer ? req.file.buffer.length : 'No buffer',
         }
       : null,
     headers: req.headers,
@@ -248,6 +233,7 @@ export const uploadDocument = async (req, res) => {
     const { applicationId, documentType } = req.body;
     const file = req.file;
 
+    // Validate request
     if (!file) {
       return res.status(400).json({
         success: false,
@@ -276,20 +262,20 @@ export const uploadDocument = async (req, res) => {
       });
     }
 
-    // Find the application by custom applicationId
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.buffer && file.buffer.length > maxSize) {
+      return res.status(400).json({
+        success: false,
+        message: 'File size too large. Maximum size is 10MB.',
+      });
+    }
+
+    // Find the application
     console.log('🔍 Looking for application with ID:', applicationId);
     const application = await VisaApplication.findOne({
       applicationId: applicationId,
     });
-
-    console.log('🔍 Application found:', application ? 'Yes' : 'No');
-    if (application) {
-      console.log('🔍 Application details:', {
-        id: application._id,
-        applicationId: application.applicationId,
-        emailAddress: application.emailAddress,
-      });
-    }
 
     if (!application) {
       console.log('❌ Application not found for ID:', applicationId);
@@ -300,9 +286,10 @@ export const uploadDocument = async (req, res) => {
       });
     }
 
-    let result;
+    console.log('✅ Application found:', application.applicationId);
 
-    // Upload to Cloudinary using the same proven approach as main backend
+    // Upload to Cloudinary
+    let result;
     try {
       console.log('☁️ Uploading to Cloudinary...');
       console.log(
@@ -319,6 +306,8 @@ export const uploadDocument = async (req, res) => {
           {
             folder: `visa-applications/${application.applicationId}/${documentType}`,
             resource_type: 'auto',
+            // Remove format restrictions to allow Cloudinary to auto-detect
+            transformation: [{ quality: 'auto:good' }],
           },
           (error, result) => {
             if (error) {
@@ -335,22 +324,23 @@ export const uploadDocument = async (req, res) => {
       });
     } catch (cloudinaryError) {
       console.error('❌ Cloudinary upload failed:', cloudinaryError);
-      throw new Error(`Cloudinary upload failed: ${cloudinaryError.message}`);
-    }
-
-    // Validate that we have both url and publicId
-    if (!result.secure_url || !result.public_id) {
-      console.error('❌ Missing required fields from Cloudinary (legacy):', {
-        secure_url: result.secure_url,
-        public_id: result.public_id,
-      });
       return res.status(500).json({
         success: false,
-        message: 'Invalid response from Cloudinary - missing required fields',
+        message: 'Failed to upload to Cloudinary',
+        error: cloudinaryError.message,
       });
     }
 
-    // Update application with document URL and publicId
+    // Validate Cloudinary response
+    if (!result.secure_url || !result.public_id) {
+      console.error('❌ Invalid Cloudinary response:', result);
+      return res.status(500).json({
+        success: false,
+        message: 'Invalid response from Cloudinary',
+      });
+    }
+
+    // Prepare document data
     const documentData = {
       name: file.originalname,
       url: result.secure_url,
@@ -361,73 +351,77 @@ export const uploadDocument = async (req, res) => {
       mimeType: file.mimetype,
     };
 
-    // Validate document data before saving
-    if (!validateDocumentData(documentData)) {
+    // Save to database
+    try {
+      await VisaApplication.findByIdAndUpdate(
+        application._id,
+        {
+          $push: { documents: documentData },
+        },
+        { new: true }
+      );
+
+      console.log('✅ Document saved to database:', {
+        applicationId: application.applicationId,
+        documentType,
+        publicId: result.public_id,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          documentType,
+          url: result.secure_url,
+          publicId: result.public_id,
+          fileName: file.originalname,
+          fileSize: file.buffer ? file.buffer.length : 0,
+          mimeType: file.mimetype,
+          uploadedAt: new Date(),
+        },
+      });
+    } catch (dbError) {
+      console.error('❌ Database save failed:', dbError);
+
+      // Try to delete from Cloudinary if database save fails
+      try {
+        await cloudinary.uploader.destroy(result.public_id);
+        console.log('✅ Cleaned up Cloudinary file after DB failure');
+      } catch (cleanupError) {
+        console.error('❌ Failed to cleanup Cloudinary file:', cleanupError);
+      }
+
       return res.status(500).json({
         success: false,
-        message: 'Invalid document data - missing required fields',
+        message: 'Failed to save document to database',
+        error: dbError.message,
       });
     }
-
-    console.log('💾 Saving document to database (legacy):', {
-      name: documentData.name,
-      url: documentData.url,
-      publicId: documentData.publicId,
-      type: documentData.type,
-    });
-
-    await VisaApplication.findByIdAndUpdate(application._id, {
-      $push: { documents: documentData },
-    });
-
-    console.log(
-      `Document uploaded successfully for application ${application.applicationId}:`,
-      {
-        documentType,
-        publicId: result.public_id,
-        url: result.secure_url,
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      data: {
-        documentType,
-        url: result.secure_url,
-        publicId: result.public_id,
-        fileName: file.originalname,
-        fileSize: file.buffer ? file.buffer.length : 0,
-        mimeType: file.mimetype,
-        uploadedAt: new Date(),
-      },
-    });
   } catch (error) {
-    console.error('❌ Error uploading document:', error);
-    console.error('❌ Error stack:', error.stack);
-    console.error('❌ Error details:', {
-      name: error.name,
-      message: error.message,
-      code: error.code,
-    });
-
+    console.error('❌ Document upload error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to upload document',
       error: error.message,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 };
 
 /**
- * Delete document from Cloudinary
+ * Delete document
  * DELETE /api/v2/visa/documents/:applicationId/:documentType
  */
 export const deleteDocument = async (req, res) => {
   try {
     const { applicationId, documentType } = req.params;
 
-    // Find the application by custom applicationId
+    if (!applicationId || !documentType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Application ID and document type are required',
+      });
+    }
+
+    // Find the application
     const application = await VisaApplication.findOne({
       applicationId: applicationId,
     });
@@ -439,55 +433,45 @@ export const deleteDocument = async (req, res) => {
       });
     }
 
-    // Find document in the documents array
-    const documentIndex = application.documents.findIndex(
+    // Find the document to get its publicId
+    const document = application.documents.find(
       doc => doc.type === documentType
     );
 
-    if (documentIndex === -1) {
+    if (!document) {
       return res.status(404).json({
         success: false,
         message: 'Document not found',
       });
     }
 
-    const documentInfo = application.documents[documentIndex];
-
-    // Delete from Cloudinary if it's a Cloudinary document
-    if (documentInfo.url && !documentInfo.url.startsWith('file://')) {
-      try {
-        await cloudinary.uploader.destroy(documentInfo.publicId || '');
-      } catch (cloudinaryError) {
-        console.log(
-          '⚠️ Cloudinary deletion failed, continuing with local removal:',
-          cloudinaryError
-        );
-      }
-    }
-
-    // Remove document from application
+    // Remove from database
     await VisaApplication.findByIdAndUpdate(application._id, {
       $pull: { documents: { type: documentType } },
     });
 
-    console.log(
-      `Document deleted successfully for application ${application.applicationId}:`,
-      {
-        documentType,
-        publicId: documentInfo.publicId,
+    // Try to delete from Cloudinary if publicId exists
+    if (document.publicId) {
+      try {
+        await cloudinary.uploader.destroy(document.publicId);
+        console.log('✅ Document deleted from Cloudinary:', document.publicId);
+      } catch (cloudinaryError) {
+        console.error('❌ Failed to delete from Cloudinary:', cloudinaryError);
+        // Don't fail the request if Cloudinary deletion fails
       }
-    );
+    }
+
+    console.log('✅ Document deleted from database:', {
+      applicationId: application.applicationId,
+      documentType,
+    });
 
     res.status(200).json({
       success: true,
       message: 'Document deleted successfully',
-      data: {
-        documentType,
-        publicId: documentInfo.publicId,
-      },
     });
   } catch (error) {
-    console.error('Error deleting document:', error);
+    console.error('❌ Error deleting document:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to delete document',
@@ -497,14 +481,21 @@ export const deleteDocument = async (req, res) => {
 };
 
 /**
- * Get document upload status
+ * Get documents for an application
  * GET /api/v2/visa/documents/:applicationId
  */
 export const getDocuments = async (req, res) => {
   try {
     const { applicationId } = req.params;
 
-    // Find the application by custom applicationId
+    if (!applicationId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Application ID is required',
+      });
+    }
+
+    // Find the application
     const application = await VisaApplication.findOne({
       applicationId: applicationId,
     });
@@ -516,8 +507,8 @@ export const getDocuments = async (req, res) => {
       });
     }
 
-    // Convert documents array to object format for frontend compatibility
-    const documentsObj = {};
+    // Transform documents array to object format for frontend compatibility
+    const documents = {};
     const uploadStatus = {
       passportPhoto: false,
       passportCopy: false,
@@ -526,34 +517,27 @@ export const getDocuments = async (req, res) => {
     };
 
     application.documents.forEach(doc => {
-      documentsObj[doc.type] = {
-        url: doc.url,
-        publicId: doc.publicId || '',
-        uploadedAt: doc.uploadedAt,
-        fileName: doc.name,
-        fileSize: doc.fileSize || 0,
-        mimeType: doc.mimeType || 'image/jpeg',
-      };
-      uploadStatus[doc.type] = true;
-
-      console.log('📋 Document found in database:', {
-        type: doc.type,
+      documents[doc.type] = {
         url: doc.url,
         publicId: doc.publicId,
+        uploadedAt: doc.uploadedAt,
         fileName: doc.name,
-      });
+        fileSize: doc.fileSize,
+        mimeType: doc.mimeType,
+      };
+      uploadStatus[doc.type] = true;
     });
 
     res.status(200).json({
       success: true,
       data: {
         applicationId: application.applicationId,
-        documents: documentsObj,
+        documents,
         uploadStatus,
       },
     });
   } catch (error) {
-    console.error('Error getting documents:', error);
+    console.error('❌ Error getting documents:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to get documents',
