@@ -18,6 +18,7 @@ import {
   updateApplication,
   updatePayment,
 } from '../controllers/visa.controller.js';
+import paymentRouter from './payment.routes.js';
 
 const router = express.Router();
 
@@ -58,6 +59,9 @@ router.patch('/applications/:id', updateApplication);
 router.post('/applications/:id/submit', submitApplication);
 router.post('/applications/:id/documents', addDocument);
 router.post('/applications/:id/payment', updatePayment);
+
+// Payments sub-routes
+router.use('/', paymentRouter);
 
 // Document Upload Routes (Direct to Cloudinary)
 router.get('/documents/config', getCloudinaryConfig);

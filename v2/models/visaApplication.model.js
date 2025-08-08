@@ -56,11 +56,26 @@ const visaApplicationSchema = new mongoose.Schema(
 
     payment: {
       isPaid: { type: Boolean, default: false },
-      method: { type: String }, // 'razorpay', 'stripe', 'paypal'
+      method: { type: String },
       amount: { type: Number },
-      currency: { type: String, default: 'INR' },
+      currency: { type: String, default: 'USD' },
       paymentId: { type: String }, // External payment ID
       paidAt: { type: Date },
+    },
+
+    // Order summary for pricing consistency
+    orderSummary: {
+      subtotal: { type: Number },
+      processingFee: { type: Number },
+      serviceFee: { type: Number },
+      discount: { type: Number, default: 0 },
+      total: { type: Number },
+      currency: { type: String, default: 'USD' },
+      breakdown: {
+        type: Map,
+        of: mongoose.Schema.Types.Mixed,
+        default: {},
+      },
     },
 
     documents: [

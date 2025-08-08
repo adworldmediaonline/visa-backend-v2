@@ -1,5 +1,6 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
+import { computeOrderSummary } from '../services/pricing.service.js';
 
 function getNextStep(application) {
   if (!application.visaType || !application.visaOptionName)
@@ -143,7 +144,8 @@ export const updateApplication = async (req, res) => {
       visaOptionName,
       emailAddress,
       phoneNumber,
-      sendEmail = false, // Optional flag to send save and exit email
+      orderSummary,
+      sendEmail = false,
     } = req.body;
 
     // Build query - only check _id if it's a valid ObjectId format
@@ -175,6 +177,20 @@ export const updateApplication = async (req, res) => {
     if (visaOptionName) application.visaOptionName = visaOptionName;
     if (emailAddress) application.emailAddress = emailAddress;
     if (phoneNumber) application.phoneNumber = phoneNumber;
+    if (orderSummary) application.orderSummary = orderSummary;
+
+    // Auto-compute order summary when enough info is present
+    if (!application.orderSummary) {
+      const fd = application.getFormData();
+      const summary = await computeOrderSummary({
+        passportCountryCode: application.passportCountry?.code,
+        destinationCountryCode: application.destinationCountry?.code,
+        visaOptionName: application.visaOptionName,
+        selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
+        numberOfTravelers: fd?.travelersInfo?.numberOfTravelers,
+      });
+      if (summary) application.orderSummary = summary;
+    }
 
     await application.save();
 
@@ -206,6 +222,7 @@ export const updateApplication = async (req, res) => {
         stepCompleted: application.stepCompleted,
         status: application.status,
         formData: application.getFormData(),
+        orderSummary: application.orderSummary,
         lastUpdatedAt: application.lastUpdatedAt,
       },
     });
@@ -242,6 +259,28 @@ export const getApplication = async (req, res) => {
       });
     }
 
+    // Ensure order summary is available for the order screen
+    try {
+      const fd = application.getFormData();
+      const summary = await computeOrderSummary({
+        passportCountryCode: application.passportCountry?.code,
+        destinationCountryCode: application.destinationCountry?.code,
+        visaOptionName: application.visaOptionName,
+        selectedProcessingTime:
+          fd?.processingTime?.selectedProcessingTime ||
+          fd?.processingTime?.selectedProcessingTimeId ||
+          fd?.processingTime?.selectedProcessingOption ||
+          fd?.processingTime?.selected,
+        numberOfTravelers: fd?.travelersInfo?.numberOfTravelers,
+      });
+      if (summary) {
+        application.orderSummary = summary;
+        await application.save();
+      }
+    } catch (err) {
+      console.error('Error computing order summary:', err);
+    }
+
     res.status(200).json({
       success: true,
       data: {
@@ -256,6 +295,7 @@ export const getApplication = async (req, res) => {
         formData: application.getFormData(),
         documents: application.documents,
         payment: application.payment,
+        orderSummary: application.orderSummary,
         emailAddress: application.emailAddress,
         phoneNumber: application.phoneNumber,
         createdAt: application.createdAt,
