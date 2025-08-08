@@ -4,7 +4,7 @@ import VisaRule from '../models/visaRule.model.js';
 
 dotenv.config();
 
-const visaRules = {
+const auToUkRule = {
   passportCountry: {
     name: 'Australia',
     code: 'AU',
@@ -166,23 +166,71 @@ const visaRules = {
   isActive: true,
 };
 
+// Australia → New Zealand (visa not required)
+const auToNzRule = {
+  passportCountry: {
+    name: 'Australia',
+    code: 'AU',
+    flag: '🇦🇺',
+  },
+  destinationCountry: {
+    name: 'New Zealand',
+    code: 'NZ',
+    flag: '🇳🇿',
+  },
+
+  visaRequired: false,
+
+  embassyRegistration: {
+    fee: 1000,
+    description: 'Embassy registration (optional)',
+    isDefault: true,
+  },
+
+  visaOptions: [],
+
+  generalInfo: {
+    description:
+      'Australian passport holders do not require a visa for short visits to New Zealand.',
+    tips: ['Carry a valid passport', 'Return/onward ticket may be required'],
+    importantNotes: ['Subject to New Zealand entry requirements'],
+  },
+  isActive: true,
+};
+
+const visaRulesEntries = [auToUkRule, auToNzRule];
+
 async function seedVisaRules() {
   try {
     // Connect to database
     await dbConnect();
     console.log('Connected to database');
 
-    // Clear existing visa rules
-    await VisaRule.deleteMany({});
-    console.log('Cleared existing visa rules');
+    // Upsert visa rules without deleting existing rules
+    const ops = visaRulesEntries.map(rule => ({
+      updateOne: {
+        filter: {
+          'passportCountry.code': rule.passportCountry.code,
+          'destinationCountry.code': rule.destinationCountry.code,
+        },
+        update: { $set: rule },
+        upsert: true,
+      },
+    }));
 
-    // Insert new visa rules
-    const createdRules = await VisaRule.insertMany([visaRules]);
-    console.log(`Created ${createdRules.length} visa rules`);
+    const result = await VisaRule.bulkWrite(ops);
+    console.log(
+      'Upserted visa rules:',
+      JSON.stringify(result.result || result, null, 2)
+    );
 
-    createdRules.forEach(rule => {
+    const saved = await VisaRule.find({
+      'passportCountry.code': { $in: ['AU'] },
+      'destinationCountry.code': { $in: ['GB', 'NZ'] },
+    });
+    saved.forEach(rule => {
       console.log(
-        `- ${rule.passportCountry.name} → ${rule.destinationCountry.name}: ${rule.visaOptions.length} visa options`
+        `- ${rule.passportCountry.name} → ${rule.destinationCountry.name}: ${rule.visaOptions.length} visa options (visaRequired=${rule.visaRequired})`
       );
     });
 
@@ -198,4 +246,4 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   seedVisaRules();
 }
 
-export { seedVisaRules, visaRules };
+export { seedVisaRules, visaRulesEntries };
