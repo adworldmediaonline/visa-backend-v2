@@ -182,12 +182,20 @@ export const updateApplication = async (req, res) => {
     // Auto-compute order summary when enough info is present
     if (!application.orderSummary) {
       const fd = application.getFormData();
+      const stage = fd?.processingTime?.selectedProcessingTime
+        ? 'processing'
+        : 'visa';
+      const travelerCount =
+        Array.isArray(fd?.applicants) && fd.applicants.length > 0
+          ? fd.applicants.length
+          : fd?.travelersInfo?.numberOfTravelers;
       const summary = await computeOrderSummary({
         passportCountryCode: application.passportCountry?.code,
         destinationCountryCode: application.destinationCountry?.code,
         visaOptionName: application.visaOptionName,
         selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
-        numberOfTravelers: fd?.travelersInfo?.numberOfTravelers,
+        numberOfTravelers: travelerCount,
+        stage,
       });
       if (summary) application.orderSummary = summary;
     }

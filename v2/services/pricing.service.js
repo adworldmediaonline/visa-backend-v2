@@ -12,6 +12,7 @@ const PROCESSING_SYNONYMS = new Map([
   ['super_express', 'super_rush'],
   ['superexpress', 'super_rush'],
   ['fast', 'rush'],
+  ['urgent', 'super_rush'],
 ]);
 
 export async function computeOrderSummary({
@@ -20,6 +21,7 @@ export async function computeOrderSummary({
   visaOptionName,
   selectedProcessingTime,
   numberOfTravelers,
+  stage = 'visa', // 'visa' at visa-type screen, 'processing' at processing-time screen
 }) {
   const travelers = Math.max(parseInt(numberOfTravelers || '1', 10) || 1, 1);
 
@@ -52,8 +54,8 @@ export async function computeOrderSummary({
 
   const baseFee = Number(option.fee || 0);
   const procFee = Number(processing.fee || 0);
-  const subtotal = baseFee * travelers;
-  const processingFee = procFee * travelers;
+  const subtotal = baseFee * travelers; // visa fee only
+  const processingFee = stage === 'processing' ? procFee * travelers : 0;
   const serviceFee = 0;
   const discount = 0;
   const total = subtotal + processingFee + serviceFee - discount;
