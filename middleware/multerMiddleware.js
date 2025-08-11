@@ -1,8 +1,8 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import AWS from 'aws-sdk';
+import dotenv from 'dotenv';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
+dotenv.config();
 
 AWS.config.update({
   accessKeyId: process.env.S3_ACCESS_KEY,
@@ -22,6 +22,15 @@ const upload = multer({
       cb(null, `${uniqueSuffix}-${file.originalname}`);
     },
   }),
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype.startsWith('image/') ||
+      file.mimetype === 'application/pdf'
+    ) {
+      return cb(null, true);
+    }
+    return cb(new Error('Only images and PDF files are allowed'), false);
+  },
 });
 
 export const uploadFiles = fields => {

@@ -21,12 +21,9 @@ import {
 
 const router = express.Router();
 
-// Configure multer for file uploads (using memory storage like main backend)
+// Configure multer for file uploads (no size limit; allow images and PDFs)
 const upload = multer({
   storage: multer.memoryStorage(), // Use memory storage instead of disk
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
   fileFilter: (req, file, cb) => {
     console.log(
       '🔍 Multer fileFilter called for:',
