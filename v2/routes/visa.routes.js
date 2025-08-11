@@ -9,6 +9,10 @@ import {
   uploadDocument,
 } from '../controllers/document.controller.js';
 import {
+  captureOrder as capturePaypalOrder,
+  createOrder as createPaypalOrder,
+} from '../controllers/paypal.controller.js';
+import {
   addDocument,
   getAllApplications,
   getApplication,
@@ -55,6 +59,9 @@ router.patch('/applications/:id', updateApplication);
 router.post('/applications/:id/submit', submitApplication);
 router.post('/applications/:id/documents', addDocument);
 router.post('/applications/:id/payment', updatePayment);
+// PayPal routes
+router.post('/applications/:id/paypal/create-order', createPaypalOrder);
+router.post('/applications/:id/paypal/capture-order', capturePaypalOrder);
 
 // Payments removed (provider TBD)
 
