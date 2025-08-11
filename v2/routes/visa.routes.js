@@ -11,6 +11,8 @@ import {
 import {
   captureOrder as capturePaypalOrder,
   createOrder as createPaypalOrder,
+  paypalCancel,
+  paypalReturn,
 } from '../controllers/paypal.controller.js';
 import {
   addDocument,
@@ -62,6 +64,8 @@ router.post('/applications/:id/payment', updatePayment);
 // PayPal routes
 router.post('/applications/:id/paypal/create-order', createPaypalOrder);
 router.post('/applications/:id/paypal/capture-order', capturePaypalOrder);
+router.get('/paypal/return', paypalReturn);
+router.get('/paypal/cancel', paypalCancel);
 
 // Payments removed (provider TBD)
 

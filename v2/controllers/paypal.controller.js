@@ -60,6 +60,9 @@ export async function createOrder(req, res) {
 
     const accessToken = await getAccessToken();
 
+    const publicBase =
+      process.env.PUBLIC_BASE_URL || 'https://visa-backend-v2.vercel.app';
+
     const orderBody = {
       intent: 'CAPTURE',
       purchase_units: [
@@ -71,8 +74,9 @@ export async function createOrder(req, res) {
       application_context: {
         brand_name: 'VisaCollect',
         user_action: 'PAY_NOW',
-        return_url: req.body.returnUrl || 'visacollect://paypal-return',
-        cancel_url: req.body.cancelUrl || 'visacollect://paypal-cancel',
+        // Use HTTPS redirector pages that deep-link back to the mobile app
+        return_url: `${publicBase}/api/v2/visa/paypal/return`,
+        cancel_url: `${publicBase}/api/v2/visa/paypal/cancel`,
       },
     };
 
@@ -178,4 +182,35 @@ export async function captureOrder(req, res) {
       error: error.message,
     });
   }
+}
+
+export async function paypalReturn(req, res) {
+  const token = req.query.token || '';
+  const appScheme = process.env.APP_SCHEME || 'visacollectmobile';
+  const appUrl = `${appScheme}://paypal-return?token=${encodeURIComponent(
+    token
+  )}`;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`<!doctype html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Returning to app…</title>
+<meta http-equiv="refresh" content="0;url='${appUrl}'" />
+<script>window.location.replace('${appUrl}');</script>
+</head><body style="font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding:20px;">
+<p>Thanks! Returning to app… If you are not redirected, <a href="${appUrl}">tap here</a>.</p>
+</body></html>`);
+}
+
+export async function paypalCancel(req, res) {
+  const appScheme = process.env.APP_SCHEME || 'visacollectmobile';
+  const appUrl = `${appScheme}://paypal-cancel`;
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.status(200).send(`<!doctype html>
+<html><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Cancelled</title>
+<meta http-equiv="refresh" content="0;url='${appUrl}'" />
+<script>window.location.replace('${appUrl}');</script>
+</head><body style="font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; padding:20px;">
+<p>Payment cancelled. Returning to app… If you are not redirected, <a href="${appUrl}">tap here</a>.</p>
+</body></html>`);
 }
