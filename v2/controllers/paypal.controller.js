@@ -1,4 +1,5 @@
 import VisaApplication from '../models/visaApplication.model.js';
+import { computeOrderSummary } from '../services/pricing.service.js';
 
 const PAYPAL_BASE_URL =
   process.env.PAYPAL_ENV === 'live'
@@ -47,6 +48,36 @@ export async function createOrder(req, res) {
       return res
         .status(404)
         .json({ success: false, message: 'Application not found' });
+    }
+
+    // Ensure server-side recomputation of amount based on saved data
+    try {
+      const fd = application.getFormData
+        ? application.getFormData()
+        : application.formData;
+      const stage = fd?.processingTime?.selectedProcessingTime
+        ? 'processing'
+        : 'visa';
+      const travelerCount =
+        Array.isArray(fd?.applicants) && fd.applicants.length > 0
+          ? fd.applicants.length
+          : fd?.travelersInfo?.numberOfTravelers;
+      const recomputed = await computeOrderSummary({
+        passportCountryCode: application.passportCountry?.code,
+        destinationCountryCode: application.destinationCountry?.code,
+        visaOptionName: application.visaOptionName,
+        selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
+        selectedValidity: application.selectedValidity || fd?.validityOption,
+        numberOfTravelers: travelerCount,
+        stage,
+      });
+      if (recomputed) {
+        application.orderSummary = recomputed;
+        await application.save();
+      }
+    } catch (err) {
+      // fallthrough to use existing summary
+      console.error('createOrder: recompute summary failed', err);
     }
 
     // Determine amount

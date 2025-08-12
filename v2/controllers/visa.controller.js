@@ -178,6 +178,14 @@ export const updateApplication = async (req, res) => {
     if (emailAddress) application.emailAddress = emailAddress;
     if (phoneNumber) application.phoneNumber = phoneNumber;
     if (orderSummary) application.orderSummary = orderSummary;
+    // Explicitly clear orderSummary when client passes undefined to force recomputation
+    if (
+      Object.prototype.hasOwnProperty.call(req.body, 'orderSummary') &&
+      orderSummary === undefined
+    ) {
+      application.orderSummary = undefined;
+      application.markModified('orderSummary');
+    }
 
     // Auto-compute order summary when enough info is present
     if (!application.orderSummary) {
@@ -194,6 +202,8 @@ export const updateApplication = async (req, res) => {
         destinationCountryCode: application.destinationCountry?.code,
         visaOptionName: application.visaOptionName,
         selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
+        selectedValidity:
+          application.selectedValidity || fd?.validityOption || undefined,
         numberOfTravelers: travelerCount,
         stage,
       });
@@ -279,6 +289,8 @@ export const getApplication = async (req, res) => {
           fd?.processingTime?.selectedProcessingTimeId ||
           fd?.processingTime?.selectedProcessingOption ||
           fd?.processingTime?.selected,
+        selectedValidity:
+          application.selectedValidity || fd?.validityOption || undefined,
         numberOfTravelers: fd?.travelersInfo?.numberOfTravelers,
       });
       if (summary) {
