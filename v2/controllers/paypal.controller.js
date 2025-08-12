@@ -50,7 +50,9 @@ export async function createOrder(req, res) {
         .json({ success: false, message: 'Application not found' });
     }
 
-    // Ensure server-side recomputation of amount based on saved data
+    // Compute the amount directly from saved selections (do not trust client)
+    let total = 0;
+    let currency = 'USD';
     try {
       const fd = application.getFormData
         ? application.getFormData()
@@ -60,33 +62,62 @@ export async function createOrder(req, res) {
         : 'visa';
       const travelerCount =
         Array.isArray(fd?.applicants) && fd.applicants.length > 0
-          ? fd.applicants.length
-          : fd?.travelersInfo?.numberOfTravelers;
-      const recomputed = await computeOrderSummary({
-        passportCountryCode: application.passportCountry?.code,
-        destinationCountryCode: application.destinationCountry?.code,
-        visaOptionName: application.visaOptionName,
-        selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
-        selectedValidity: application.selectedValidity || fd?.validityOption,
-        numberOfTravelers: travelerCount,
-        stage,
-      });
-      if (recomputed) {
-        application.orderSummary = recomputed;
-        await application.save();
+          ? fd.applicants.length + 1
+          : typeof fd?.travelersInfo?.numberOfTravelers === 'number' &&
+            fd.travelersInfo.numberOfTravelers > 0
+          ? fd.travelersInfo.numberOfTravelers
+          : 1;
+
+      const validityFee = Number(
+        (application.selectedValidity && application.selectedValidity.fee) !=
+          null
+          ? application.selectedValidity.fee
+          : fd?.validityOption?.fee || 0
+      );
+      const processingSingleFee = Number(
+        fd?.processingTime?.selectedProcessingFee || 0
+      );
+      const subtotal = Number.isFinite(validityFee)
+        ? validityFee * Math.max(1, travelerCount)
+        : 0;
+      const processingFee = stage === 'processing' ? processingSingleFee : 0;
+      currency =
+        application.selectedValidity?.currency ||
+        fd?.processingTime?.selectedProcessingCurrency ||
+        'USD';
+
+      total = subtotal + processingFee;
+
+      // Fallback to rules-based computation only if subtotal missing
+      if (!(total > 0)) {
+        const summary = await computeOrderSummary({
+          passportCountryCode: application.passportCountry?.code,
+          destinationCountryCode: application.destinationCountry?.code,
+          visaOptionName: application.visaOptionName,
+          selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
+          selectedValidity: application.selectedValidity || fd?.validityOption,
+          selectedProcessingFee: fd?.processingTime?.selectedProcessingFee,
+          numberOfTravelers: travelerCount,
+          stage,
+        });
+        if (
+          !summary ||
+          typeof summary.total !== 'number' ||
+          summary.total <= 0
+        ) {
+          return res.status(400).json({
+            success: false,
+            message: 'Unable to compute order amount',
+          });
+        }
+        total = summary.total;
+        currency = summary.currency || currency;
       }
     } catch (err) {
-      // fallthrough to use existing summary
-      console.error('createOrder: recompute summary failed', err);
-    }
-
-    // Determine amount
-    const currency = application.orderSummary?.currency || 'USD';
-    const total = application.orderSummary?.total;
-    if (typeof total !== 'number' || total <= 0) {
+      console.error('createOrder: compute amount failed', err);
       return res
         .status(400)
-        .json({ success: false, message: 'Invalid order amount' });
+        .json({ success: false, message: 'Unable to compute order amount' });
     }
 
     const accessToken = await getAccessToken();
@@ -191,12 +222,17 @@ export async function captureOrder(req, res) {
     const captureId = data?.purchase_units?.[0]?.payments?.captures?.[0]?.id;
     const status = data?.status;
 
-    // Update application payment status
+    // Update application payment status from captured total
     application.payment = {
       isPaid: status === 'COMPLETED',
       method: 'paypal',
-      amount: application.orderSummary?.total,
-      currency: application.orderSummary?.currency || 'USD',
+      amount:
+        Number(
+          data?.purchase_units?.[0]?.payments?.captures?.[0]?.amount?.value
+        ) || undefined,
+      currency:
+        data?.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+          ?.currency_code || 'USD',
       paymentId: captureId || orderId,
       paidAt: new Date(),
     };

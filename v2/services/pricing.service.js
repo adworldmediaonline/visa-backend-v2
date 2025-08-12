@@ -23,6 +23,7 @@ export async function computeOrderSummary({
   numberOfTravelers,
   stage = 'visa', // 'visa' at visa-type screen, 'processing' at processing-time screen
   selectedValidity,
+  selectedProcessingFee,
 }) {
   const travelers = Math.max(parseInt(numberOfTravelers || '1', 10) || 1, 1);
 
@@ -59,9 +60,13 @@ export async function computeOrderSummary({
       ? selectedValidity.fee
       : option.fee || 0
   );
-  const procFee = Number(processing.fee || 0);
+  const procFee = Number(
+    (selectedProcessingFee != null ? selectedProcessingFee : processing.fee) ||
+      0
+  );
   const subtotal = baseFee * travelers; // visa fee only
-  const processingFee = stage === 'processing' ? procFee * travelers : 0;
+  // Processing fee should NOT be multiplied by number of travelers
+  const processingFee = stage === 'processing' ? procFee : 0;
   const serviceFee = 0;
   const discount = 0;
   const total = subtotal + processingFee + serviceFee - discount;
