@@ -8,10 +8,7 @@ export const emailConfig = {
   branding: {
     companyName: 'VisaCollect',
     logoUrl: 'https://visacollect.com/images/logo.png',
-    websiteUrl: 'https://visacollect.com',
-    supportEmail: 'support@visacollect.com',
-    supportPhone: '+1 (888) 369-3111',
-    supportPhoneRaw: '+18883693111',
+    supportEmail: 'info@visacollect.com',
   },
 
   // SMTP Configuration
@@ -44,10 +41,10 @@ export const emailConfig = {
 
   // Email template settings
   templates: {
-    defaultFrom: process.env.HOSTINGER_EMAIL || 'support@visacollect.com',
-    baseUrl: process.env.BASE_URL || 'https://visacollect.com',
-    trackingUrl: process.env.TRACKING_URL || 'https://visacollect.com/track',
-    resumeUrl: process.env.RESUME_URL || 'https://visacollect.com/resume',
+    defaultFrom: process.env.HOSTINGER_EMAIL || 'info@visacollect.com',
+    // Mobile app deep links
+    continueAppUrl: 'visacollect://home', // Opens Home tab in mobile app
+    trackAppUrl: 'visacollect://track', // Opens Track tab in mobile app
   },
 
   // Environment detection

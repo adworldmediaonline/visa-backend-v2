@@ -24,9 +24,7 @@ export function generateApplicationStartTemplate(data) {
     userEmail,
   } = data;
 
-  const { branding, templates } = emailConfig;
-  const trackingUrl = `${templates.trackingUrl}/${applicationId}`;
-  const resumeUrl = `${templates.resumeUrl}/${applicationId}`;
+  const { branding } = emailConfig;
 
   return `
 <!DOCTYPE html>
@@ -95,11 +93,6 @@ export function generateApplicationStartTemplate(data) {
                 </ul>
             </div>
 
-            <!-- Action Buttons -->
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="${resumeUrl}" class="button">Continue Application</a>
-                <a href="${trackingUrl}" class="button" style="background-color: #6366f1;">Track Progress</a>
-            </div>
 
             <!-- Next Steps -->
             <div class="next-steps">
@@ -121,13 +114,7 @@ export function generateApplicationStartTemplate(data) {
             <p>
                 <strong>Email:</strong> <a href="mailto:${
                   branding.supportEmail
-                }">${branding.supportEmail}</a><br>
-                <strong>Phone:</strong> <a href="tel:${
-                  branding.supportPhoneRaw
-                }">${branding.supportPhone}</a><br>
-                <strong>Website:</strong> <a href="${branding.websiteUrl}">${
-    branding.websiteUrl
-  }</a>
+                }">${branding.supportEmail}</a>
             </p>
             <div class="copyright">
                 © ${new Date().getFullYear()} ${
