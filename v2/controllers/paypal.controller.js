@@ -1,5 +1,6 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import { computeOrderSummary } from '../services/pricing.service.js';
+import { sendPaymentConfirmationEmail } from '../email/index.js';
 
 const PAYPAL_BASE_URL =
   process.env.PAYPAL_ENV === 'live'
@@ -237,6 +238,27 @@ export async function captureOrder(req, res) {
       paidAt: new Date(),
     };
     await application.save();
+
+    // Send payment confirmation email if email address is available and payment is completed
+    if (application.emailAddress && status === 'COMPLETED') {
+      try {
+        const emailResult = await sendPaymentConfirmationEmail(
+          application.applicationId,
+          application.payment
+        );
+        console.log(
+          `Payment confirmation email sent successfully for ${application.applicationId}`
+        );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
+      } catch (emailError) {
+        console.error('Error sending payment confirmation email:', emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     return res
       .status(200)
