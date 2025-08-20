@@ -262,14 +262,7 @@ export const uploadDocument = async (req, res) => {
       });
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.buffer && file.buffer.length > maxSize) {
-      return res.status(400).json({
-        success: false,
-        message: 'File size too large. Maximum size is 10MB.',
-      });
-    }
+    // No explicit file size restriction here; rely on infra limits and Cloudinary
 
     // Find the application
     console.log('🔍 Looking for application with ID:', applicationId);

@@ -9,6 +9,12 @@ import {
   uploadDocument,
 } from '../controllers/document.controller.js';
 import {
+  captureOrder as capturePaypalOrder,
+  createOrder as createPaypalOrder,
+  paypalCancel,
+  paypalReturn,
+} from '../controllers/paypal.controller.js';
+import {
   addDocument,
   getAllApplications,
   getApplication,
@@ -21,12 +27,9 @@ import {
 
 const router = express.Router();
 
-// Configure multer for file uploads (using memory storage like main backend)
+// Configure multer for file uploads (no size limit; allow images and PDFs)
 const upload = multer({
   storage: multer.memoryStorage(), // Use memory storage instead of disk
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
   fileFilter: (req, file, cb) => {
     console.log(
       '🔍 Multer fileFilter called for:',
@@ -58,6 +61,13 @@ router.patch('/applications/:id', updateApplication);
 router.post('/applications/:id/submit', submitApplication);
 router.post('/applications/:id/documents', addDocument);
 router.post('/applications/:id/payment', updatePayment);
+// PayPal routes
+router.post('/applications/:id/paypal/create-order', createPaypalOrder);
+router.post('/applications/:id/paypal/capture-order', capturePaypalOrder);
+router.get('/paypal/return', paypalReturn);
+router.get('/paypal/cancel', paypalCancel);
+
+// Payments removed (provider TBD)
 
 // Document Upload Routes (Direct to Cloudinary)
 router.get('/documents/config', getCloudinaryConfig);

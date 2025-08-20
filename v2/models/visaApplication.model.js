@@ -35,6 +35,28 @@ const visaApplicationSchema = new mongoose.Schema(
       required: false, // E.g., "United Kingdom ETA"
     },
 
+    // Whether visa is required for this route according to visa-rules
+    visaRequired: {
+      type: Boolean,
+      required: false,
+    },
+
+    // Chosen validity option from visa-rules → visaOptions → validityOptions
+    selectedValidity: {
+      name: { type: String },
+      validityTime: { type: String },
+      entryType: { type: String },
+      fee: { type: Number },
+      isDefault: { type: Boolean },
+    },
+
+    // Embassy registration preference when visa not required
+    embassyRegistration: {
+      selected: { type: Boolean, default: false },
+      fee: { type: Number },
+      description: { type: String },
+    },
+
     formData: {
       type: Map,
       of: mongoose.Schema.Types.Mixed,
@@ -56,11 +78,26 @@ const visaApplicationSchema = new mongoose.Schema(
 
     payment: {
       isPaid: { type: Boolean, default: false },
-      method: { type: String }, // 'razorpay', 'stripe', 'paypal'
+      method: { type: String },
       amount: { type: Number },
-      currency: { type: String, default: 'INR' },
+      currency: { type: String, default: 'USD' },
       paymentId: { type: String }, // External payment ID
       paidAt: { type: Date },
+    },
+
+    // Order summary for pricing consistency
+    orderSummary: {
+      subtotal: { type: Number },
+      processingFee: { type: Number },
+      serviceFee: { type: Number },
+      discount: { type: Number, default: 0 },
+      total: { type: Number },
+      currency: { type: String, default: 'USD' },
+      breakdown: {
+        type: Map,
+        of: mongoose.Schema.Types.Mixed,
+        default: {},
+      },
     },
 
     documents: [

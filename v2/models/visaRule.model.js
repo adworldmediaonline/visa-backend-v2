@@ -38,30 +38,22 @@ const formFieldSchema = new mongoose.Schema({
 const visaOptionSchema = new mongoose.Schema({
   name: { type: String, required: true },
   visaType: { type: String, required: true },
-  entryType: { type: String },
-  validity: { type: String },
-  stayPerVisit: { type: String },
-  processingTime: { type: String },
-  fee: { type: Number, required: true },
-  currency: { type: String, default: 'INR' },
-  governmentFeeDisplay: { type: String },
-  badges: [
-    {
-      label: { type: String },
-      color: { type: String },
-    },
-  ],
-  requiredDocuments: [{ type: String }],
-  description: { type: String },
-  eligibility: { type: String },
   whatToKnow: { type: String },
   learnMore: { type: String },
+  validityOptions: [
+    {
+      name: { type: String },
+      validityTime: { type: String },
+      entryType: { type: String },
+      fee: { type: Number, required: true },
+      isDefault: { type: Boolean, default: false },
+    },
+  ],
+
   processingOptions: [
     {
-      id: { type: String, required: true },
       name: { type: String, required: true },
       fee: { type: Number, required: true },
-      currency: { type: String, default: 'INR' },
       processingTime: { type: String, required: true },
       description: { type: String },
       isDefault: { type: Boolean, default: false },
@@ -88,6 +80,12 @@ const visaRuleSchema = new mongoose.Schema(
     },
 
     visaRequired: { type: Boolean, required: true },
+
+    embassyRegistration: {
+      fee: { type: Number, required: true },
+      description: { type: String },
+      isDefault: { type: Boolean, default: false },
+    },
 
     visaOptions: [visaOptionSchema],
 

@@ -1,5 +1,10 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
+import { computeOrderSummary } from '../services/pricing.service.js';
+import {
+  sendApplicationStartEmail,
+  sendSaveAndExitEmail,
+} from '../email/index.js';
 
 function getNextStep(application) {
   if (!application.visaType || !application.visaOptionName)
@@ -91,20 +96,24 @@ export const startApplication = async (req, res) => {
     await application.save();
 
     // Send application start confirmation email if email address is provided
-    // TODO: Uncomment when email functionality is ready
-    /*
     if (emailAddress) {
       try {
-        await sendApplicationStartEmail(application.applicationId);
+        const emailResult = await sendApplicationStartEmail(
+          application.applicationId
+        );
         console.log(
           `Application start email sent successfully for ${application.applicationId}`
         );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
       } catch (emailError) {
         console.error('Error sending application start email:', emailError);
         // Continue with the response even if email fails
       }
     }
-    */
 
     res.status(201).json({
       success: true,
@@ -143,7 +152,8 @@ export const updateApplication = async (req, res) => {
       visaOptionName,
       emailAddress,
       phoneNumber,
-      sendEmail = false, // Optional flag to send save and exit email
+      orderSummary,
+      sendEmail = false,
     } = req.body;
 
     // Build query - only check _id if it's a valid ObjectId format
@@ -175,28 +185,64 @@ export const updateApplication = async (req, res) => {
     if (visaOptionName) application.visaOptionName = visaOptionName;
     if (emailAddress) application.emailAddress = emailAddress;
     if (phoneNumber) application.phoneNumber = phoneNumber;
+    if (orderSummary) application.orderSummary = orderSummary;
+    // Explicitly clear orderSummary when client passes undefined to force recomputation
+    if (
+      Object.prototype.hasOwnProperty.call(req.body, 'orderSummary') &&
+      orderSummary === undefined
+    ) {
+      application.orderSummary = undefined;
+      application.markModified('orderSummary');
+    }
+
+    // Auto-compute order summary when enough info is present
+    if (!application.orderSummary) {
+      const fd = application.getFormData();
+      const stage = fd?.processingTime?.selectedProcessingTime
+        ? 'processing'
+        : 'visa';
+      const travelerCount =
+        Array.isArray(fd?.applicants) && fd.applicants.length > 0
+          ? fd.applicants.length
+          : fd?.travelersInfo?.numberOfTravelers;
+      const summary = await computeOrderSummary({
+        passportCountryCode: application.passportCountry?.code,
+        destinationCountryCode: application.destinationCountry?.code,
+        visaOptionName: application.visaOptionName,
+        selectedProcessingTime: fd?.processingTime?.selectedProcessingTime,
+        selectedValidity:
+          application.selectedValidity || fd?.validityOption || undefined,
+        numberOfTravelers: travelerCount,
+        stage,
+      });
+      if (summary) application.orderSummary = summary;
+    }
 
     await application.save();
 
     // Send save and exit email if requested and email is available
-    // TODO: Uncomment when email functionality is ready
-    /*
     if (
       sendEmail &&
       application.emailAddress &&
       stepCompleted > previousStepCompleted
     ) {
       try {
-        await sendSaveAndExitEmail(application.applicationId);
+        const emailResult = await sendSaveAndExitEmail(
+          application.applicationId
+        );
         console.log(
           `Save and exit email sent successfully for ${application.applicationId}`
         );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
       } catch (emailError) {
         console.error('Error sending save and exit email:', emailError);
         // Continue with the response even if email fails
       }
     }
-    */
 
     res.status(200).json({
       success: true,
@@ -206,6 +252,7 @@ export const updateApplication = async (req, res) => {
         stepCompleted: application.stepCompleted,
         status: application.status,
         formData: application.getFormData(),
+        orderSummary: application.orderSummary,
         lastUpdatedAt: application.lastUpdatedAt,
       },
     });
@@ -242,6 +289,30 @@ export const getApplication = async (req, res) => {
       });
     }
 
+    // Ensure order summary is available for the order screen
+    try {
+      const fd = application.getFormData();
+      const summary = await computeOrderSummary({
+        passportCountryCode: application.passportCountry?.code,
+        destinationCountryCode: application.destinationCountry?.code,
+        visaOptionName: application.visaOptionName,
+        selectedProcessingTime:
+          fd?.processingTime?.selectedProcessingTime ||
+          fd?.processingTime?.selectedProcessingTimeId ||
+          fd?.processingTime?.selectedProcessingOption ||
+          fd?.processingTime?.selected,
+        selectedValidity:
+          application.selectedValidity || fd?.validityOption || undefined,
+        numberOfTravelers: fd?.travelersInfo?.numberOfTravelers,
+      });
+      if (summary) {
+        application.orderSummary = summary;
+        await application.save();
+      }
+    } catch (err) {
+      console.error('Error computing order summary:', err);
+    }
+
     res.status(200).json({
       success: true,
       data: {
@@ -256,6 +327,7 @@ export const getApplication = async (req, res) => {
         formData: application.getFormData(),
         documents: application.documents,
         payment: application.payment,
+        orderSummary: application.orderSummary,
         emailAddress: application.emailAddress,
         phoneNumber: application.phoneNumber,
         createdAt: application.createdAt,

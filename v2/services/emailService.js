@@ -118,9 +118,48 @@ const emailConfig = {
 
 /**
  * Creates a nodemailer transporter based on environment configuration
+ * Uses Ethereal for testing/development and real SMTP for production
  * @returns {object} - Configured nodemailer transporter
  */
-function createTransporter() {
+async function createTransporter() {
+  // Use Ethereal for testing/development
+  if (
+    process.env.NODE_ENV !== 'production' ||
+    process.env.USE_ETHEREAL === 'true'
+  ) {
+    try {
+      // Create Ethereal test account
+      const testAccount = await nodemailer.createTestAccount();
+
+      console.log('📧 Using Ethereal Email for testing');
+      console.log('📧 Ethereal credentials:', {
+        user: testAccount.user,
+        pass: testAccount.pass,
+        web: testAccount.web,
+      });
+
+      return nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+        tls: { ciphers: 'TLSv1.2' },
+        debug: true,
+      });
+    } catch (error) {
+      console.error(
+        '❌ Failed to create Ethereal account, falling back to production SMTP:',
+        error
+      );
+      // Fall back to production SMTP if Ethereal fails
+    }
+  }
+
+  // Production SMTP configuration
+  console.log('📧 Using production SMTP configuration');
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: process.env.SMTP_PORT || 587,
@@ -231,7 +270,7 @@ async function prepareVisaApplicationEmail(
  */
 async function sendEmail(emailData) {
   try {
-    const transporter = createTransporter();
+    const transporter = await createTransporter();
 
     const mailOptions = {
       from: process.env.HOSTINGER_EMAIL || emailConfig.defaults.support_email,
@@ -242,9 +281,21 @@ async function sendEmail(emailData) {
 
     const info = await transporter.sendMail(mailOptions);
 
+    // Log Ethereal preview URL if using Ethereal
+    if (
+      process.env.NODE_ENV !== 'production' ||
+      process.env.USE_ETHEREAL === 'true'
+    ) {
+      const previewURL = nodemailer.getTestMessageUrl(info);
+      if (previewURL) {
+        console.log('📧 Ethereal Email Preview URL:', previewURL);
+      }
+    }
+
     return {
       success: true,
       messageId: info.messageId,
+      previewURL: nodemailer.getTestMessageUrl(info),
       ...emailData,
     };
   } catch (error) {

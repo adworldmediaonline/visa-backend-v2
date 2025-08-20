@@ -57,9 +57,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB max file size
-  },
+  // No size limits here; S3/Cloudinary and upstream infra will enforce practical limits
 });
 
 export default upload;

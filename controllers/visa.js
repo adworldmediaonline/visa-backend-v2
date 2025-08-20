@@ -1,7 +1,6 @@
-import paypal from '@paypal/checkout-server-sdk';
 import nodemailer from 'nodemailer';
-import VisaRequestForm from '../models/visa.js';
 import { sendIndiaApplicationConfirmation } from '../mailConfig/mail.config.js';
+import VisaRequestForm from '../models/visa.js';
 
 const visaRequestFormController = {
   loginEvisaUser: async (req, res) => {
@@ -458,114 +457,6 @@ const visaRequestFormController = {
       res.json({ message: 'Form deleted successfully' });
     } catch (err) {
       res.status(500).json({ error: 'Internal Server Error' });
-    }
-  },
-
-  // india visa payments
-  makeIndiaVisaPayment: async (req, res) => {
-    try {
-      const { HOSTINGER_EMAIL, HOSTINGER_PASSWORD } = req.mailAuth;
-      const request = new paypal.orders.OrdersCreateRequest();
-      request.requestBody({
-        intent: 'CAPTURE',
-        purchase_units: [
-          {
-            amount: {
-              currency_code: 'USD',
-              value: '1.00',
-              breakdown: {
-                item_total: {
-                  currency_code: 'USD',
-                  value: '1.00',
-                },
-              },
-            },
-            items: [
-              {
-                name: 'Evisa testing',
-                description: 'Evisa testing description',
-                quantity: '1',
-                unit_amount: {
-                  currency_code: 'USD',
-                  value: '1.00',
-                },
-              },
-            ],
-          },
-        ],
-      });
-
-      const response = await client.execute(request);
-      console.log(response);
-      return res.status(200).json({
-        id: response.result.id,
-      });
-      // need to uncomment this below code after payment gateway completes
-      // if (!req.body.termsAndConditions) {
-      //   return res
-      //     .status(400)
-      //     .json({ message: 'terms and conditions required', status: 400 });
-      // }
-      // const visaRequestForm = await VisaRequestForm.findById(req.params.id);
-      // const data = await VisaRequestForm.findOneAndUpdate(
-      //   { _id: req.params.id },
-      //   {
-      //     lastExitStepUrl: req.body.lastExitStepUrl,
-      //     paymentStatus: req.body.paymentStatus,
-      //     termsAndConditionsContent: req.body.termsAndConditionsContent,
-      //     termsAndConditions: req.body.termsAndConditions,
-      //   },
-      //   {
-      //     new: true,
-      //   }
-      // );
-      // if (!data) {
-      //   return res.status(404).json({ error: 'Form not found' });
-      // }
-      // // NODEMAILER
-      // const transporter = nodemailer.createTransport({
-      //   host: 'smtp.gmail.com',
-      //   port: 465,
-      //   secure: true,
-      //   auth: {
-      //     user: HOSTINGER_EMAIL,
-      //     pass: process.env.GMAIL_PASSWORD,
-      //   },
-      // });
-      // const mailOptions = {
-      //   from: 'digitalcappuccinoggn@gmail.com',
-      //   to: data.emailId,
-      //   subject: 'temporary ID.',
-      //   text: `Dear Sir/Madam,\n\nYour payment completed successfully. Please note down the Temporary Application ID: ${data._id}\n\n(Application ID required)`,
-      // };
-      // try {
-      //   const info = await transporter.sendMail(mailOptions);
-      //   console.log('Email sent:', info.response);
-      //   return res.status(200).json({ data, id: session.id });
-      // } catch (error) {
-      //   console.error('Error sending email:', error);
-      //   return res.status(400).json({ message: 'error' });
-      // }
-      // res.json({ id: session.id });
-    } catch (error) {
-      console.log(error);
-      const data = await VisaRequestForm.findOneAndUpdate(
-        { _id: req.params.id },
-        {
-          lastExitStepUrl: req.body.lastExitStepUrl,
-          paymentStatus: 'pendingPayment',
-          termsAndConditionsContent: '',
-          termsAndConditions: false,
-        },
-        {
-          new: true,
-        }
-      );
-
-      if (!data) {
-        return res.status(404).json({ error: 'Form not found' });
-      }
-      return res.status(500).json({ error: error });
     }
   },
 };
