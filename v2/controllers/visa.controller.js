@@ -3,6 +3,7 @@ import VisaRule from '../models/visaRule.model.js';
 import { computeOrderSummary } from '../services/pricing.service.js';
 import {
   sendApplicationStartEmail,
+  sendPaymentConfirmationEmail,
   sendSaveAndExitEmail,
 } from '../email/index.js';
 
@@ -490,6 +491,27 @@ export const updatePayment = async (req, res) => {
     };
 
     await application.save();
+
+    // Send payment confirmation email if email address is available
+    if (application.emailAddress) {
+      try {
+        const emailResult = await sendPaymentConfirmationEmail(
+          application.applicationId,
+          application.payment
+        );
+        console.log(
+          `Payment confirmation email sent successfully for ${application.applicationId}`
+        );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
+      } catch (emailError) {
+        console.error('Error sending payment confirmation email:', emailError);
+        // Continue with the response even if email fails
+      }
+    }
 
     res.status(200).json({
       success: true,

@@ -5,6 +5,7 @@
 
 export {
   sendApplicationStartEmail,
+  sendPaymentConfirmationEmail,
   sendSaveAndExitEmail,
   isValidEmail,
 } from './services/emailService.js';
@@ -14,6 +15,10 @@ export {
   generateApplicationStartTemplate,
   generateApplicationStartSubject,
 } from './templates/applicationStartTemplate.js';
+export {
+  generatePaymentConfirmationTemplate,
+  generatePaymentConfirmationSubject,
+} from './templates/paymentConfirmationTemplate.js';
 
 // Default export for convenience
 export { default as emailService } from './services/emailService.js';
