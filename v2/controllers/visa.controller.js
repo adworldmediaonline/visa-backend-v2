@@ -1,6 +1,10 @@
 import VisaApplication from '../models/visaApplication.model.js';
 import VisaRule from '../models/visaRule.model.js';
 import { computeOrderSummary } from '../services/pricing.service.js';
+import {
+  sendApplicationStartEmail,
+  sendSaveAndExitEmail,
+} from '../email/index.js';
 
 function getNextStep(application) {
   if (!application.visaType || !application.visaOptionName)
@@ -92,20 +96,24 @@ export const startApplication = async (req, res) => {
     await application.save();
 
     // Send application start confirmation email if email address is provided
-    // TODO: Uncomment when email functionality is ready
-    /*
     if (emailAddress) {
       try {
-        await sendApplicationStartEmail(application.applicationId);
+        const emailResult = await sendApplicationStartEmail(
+          application.applicationId
+        );
         console.log(
           `Application start email sent successfully for ${application.applicationId}`
         );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
       } catch (emailError) {
         console.error('Error sending application start email:', emailError);
         // Continue with the response even if email fails
       }
     }
-    */
 
     res.status(201).json({
       success: true,
@@ -213,24 +221,28 @@ export const updateApplication = async (req, res) => {
     await application.save();
 
     // Send save and exit email if requested and email is available
-    // TODO: Uncomment when email functionality is ready
-    /*
     if (
       sendEmail &&
       application.emailAddress &&
       stepCompleted > previousStepCompleted
     ) {
       try {
-        await sendSaveAndExitEmail(application.applicationId);
+        const emailResult = await sendSaveAndExitEmail(
+          application.applicationId
+        );
         console.log(
           `Save and exit email sent successfully for ${application.applicationId}`
         );
+
+        // Log Ethereal preview URL if available
+        if (emailResult.previewURL) {
+          console.log(`📧 Email preview: ${emailResult.previewURL}`);
+        }
       } catch (emailError) {
         console.error('Error sending save and exit email:', emailError);
         // Continue with the response even if email fails
       }
     }
-    */
 
     res.status(200).json({
       success: true,
